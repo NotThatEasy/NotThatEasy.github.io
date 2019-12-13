@@ -2,7 +2,7 @@
 <html>
     <head>
 
-        <script src="scripts/twomin.js">
+        <script  src = "scripts/twomin.js">
             
         </script>
 
@@ -13,16 +13,26 @@
     <body>
 
         <script>
-        
-            let fieldSize = 660;
+            //Beginning of definitive script section
+            const width0  = window.innerWidth;
+            const width1 = document.documentElement.clientWidth;
+            const width2 = document.body.clientWidth;
+            const height0 = window.innerHeight;
+            const height1 = document.documentElement.clientHeight;
+            const height2 = document.body.clientHeight;
+            console.log(width0, height0);
+            console.log(width1, height1);
+            console.log(width2, height2);
+
+
+            let fieldSize = 770;
             let outlineWidth = 5;
-            let elementSize = fieldSize + outlineWidth * 2;
-            
             let field_xbyx = 5;
             
-            let tileSize = 100;
+            let tileSize = 130;
             let gap = 15;
-            
+
+            let elementSize = fieldSize + outlineWidth * 2;
             let step = tileSize + gap;
             
             let margin = (elementSize - tileSize * field_xbyx - gap * (field_xbyx - 1) ) / 2 + tileSize / 2;
@@ -36,8 +46,11 @@
 
             let colormap_tile = {2: 'blanchedalmond', 4: 'wheat', 8: 'rgb(231, 194,156)', 16: 'rgb(218,166,134)', 32: 'rgb(205,145,115)', 64: 'rgb(192,130,90)'
                 , 128: 'rgb(175,115,75)', 256: 'rgb(190,120,30)', 512: 'rgb(210,130,30)', 1024: 'rgb(130, 50, 50)', 2048: 'rgb(120, 30, 30)'};
-            //let colormap_text = {2: '', 4: '', 8: '', 16: '', 32: '', 64: '', 128: '', 256: '', 512: '', 1024: '', 2048: ''};
             
+            
+            
+    
+            //Function to convert milliseconds to specific number of frames assuming animation is 60 fps
             function msToFrames(milliseconds)
             {
                 return Math.floor(60 * milliseconds / 1000);
@@ -71,7 +84,7 @@
                     for(let i = 0; i < field_xbyx * field_xbyx; ++i){
 
                         this.tileSprites[i] = (this.space.makeRoundedRectangle(i % 5 * step + margin, Math.floor(i / 5) * step + margin
-                            , tileSize, tileSize, 7));
+                            , tileSize, tileSize));
                         this.tileSprites[i].fill = 'rgb(127,200,170)';
                         this.tileSprites[i].stroke = 'rgb(225,240,240)';
                     }
@@ -95,12 +108,88 @@
 
                         this.tiles[current] = new Tile(current, this.space);
                     }
-
+                    
+                    this.keyListener = null;
+                    this.attachControls();
                     
 
                 }
 
 
+                //Method utilized to add controls to the in-game tiles and to make the game play itself
+                attachControls()
+                {
+                    let context = this;
+                    let LEFT = 37, RIGHT = 39, UP = 38, DOWN = 40;
+                    let ENTER = 13;
+                    let autoplaying = false;
+                    //Array and function definition for autoplay
+                    let selector = [[0,1], [1, 0], [0, -1], [-1, 0]];
+                    function randomize()
+                    {
+                        return Math.round(Math.random() * 3);
+                    }
+                    //Autoplay function            
+                    function auto(){
+                        if(document.getElementById('draw').style.display === 'none')
+                            return;
+
+                        let x = randomize();
+                        if(field.animated())
+                            ;
+                        else
+                            field.move(selector[x][0], selector[x][1]);
+                            ;
+                    }
+
+                    this.keyListener = function(event){
+                        if(document.getElementById('draw').style.display === 'none')
+                            return;
+
+                        switch(event.keyCode){
+                            case ENTER:
+                                if(autoplaying){
+                                    autoplaying = false;
+                                    space.unbind('update', auto);
+                                }
+                                else{
+                                    autoplaying = true;
+                                    space.bind('update', auto);
+                                    space.play();
+                                }
+                                break;
+                            case LEFT: 
+                                //left;
+                                if(!context.animated()){
+                                    context.move(-1, 0);
+                                }
+                                break;
+                            case UP: 
+                                //up;
+                                if(!context.animated()){
+                                    context.move(0, -1);
+                                }
+                                break;
+                            case RIGHT:
+                                //right;
+                                if(!context.animated()){
+                                    context.move(1, 0);
+                                }
+                                break;
+                            case DOWN:
+                                //down;
+                                if(!context.animated()){
+                                    context.move(0, 1);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    };
+                    window.addEventListener('keydown', context.keyListener);
+                }
+                
+                
                 /*
                  * Method to move the tiles on user input
                  */
@@ -134,7 +223,8 @@
                         //Revert the target one tile back against the parameter specified direction and move to the new target
                         tile_logic: if(
                         //If the tile is out of range or is not on the same row/column as the tile logic intends to move
-                        typeof this.tiles[target] == 'undefined' || !(target % 5 === current % 5 && horizontal === 0 || Math.floor(target / 5) === Math.floor(current / 5) && vertical === 0) 
+                        typeof this.tiles[target] == 'undefined' 
+                        || !(target % 5 === current % 5 && horizontal === 0 || Math.floor(target / 5) === Math.floor(current / 5) && vertical === 0) 
                         //otherwise, in case value of not-null target is not the same as the one logic intends to move 
                         || (this.tiles[current].value === this.tiles[target].value ? false : true)
                         //lastly, if target tile has been merged during this move
@@ -248,10 +338,11 @@
                     return 0;
                 }
 
+                //Method to check if there are any moves eligible for making
                 no_moves()
                 {
                     let passed = [];
-                    
+                    //helper function to decide whether the compared tiles are valid and equal
                     function ok(context, one, another)
                     {
                         if(typeof context.tiles[another] !== 'undefined'){
@@ -262,6 +353,7 @@
                         return false;
                     }
 
+                    //Compare each tile with its neighbors
                     for(let i = 0; i < 25; ++i){
                         if(ok(this, i, i-1) || ok(this, i, i + 1) || ok(this, i, i - field_xbyx) || ok(this, i, i + field_xbyx)){
                             return false;
@@ -319,6 +411,24 @@
                     };
                     this.space.bind('update', spawner);
                 }
+
+                destroy()
+                {
+                    this.space = undefined;
+                    window.removeEventListener('keydown', this.keyListener);
+                    this.keyListener = undefined;
+                    for(let each of this.tileSprites){
+                        each.remove();
+                        //each = undefined;
+                    }
+                    this.tileSprites = undefined;
+                    this._field.remove();
+                    this._field = undefined;
+                    for(let each of this.tiles){
+                        each.destroy();
+                    }
+                    this.tiles = undefined;
+                }
             };
 
 
@@ -326,7 +436,7 @@
                 constructor(position, space)
                 {
                     this.value = 2;
-                    let coords = {x: position % 5 * step + margin, y: Math.floor(position / 5) * step + margin};
+                    let coords = {x: position % field_xbyx * step + margin, y: Math.floor(position / field_xbyx) * step + margin};
                     //Defining drawing space
                     this.space = space;
                     
@@ -349,15 +459,13 @@
 
                 }
 
-                //
+                //Definition of function that plays upon reaching 2048
                 animate_gameover()
                 {
                     let context = this;
-                    //
-                    //this.final = true;
-                    //
                     this.gameovering = true;
                     let frameChange = 0.05;
+
                     let gameover = function()
                     {
                         if(typeof context.final !== 'undefined' && context.final){
@@ -365,11 +473,9 @@
                             context.moving = false;
                             context.gameovering = false;
                             context.merging = false;
-
                         }
                         else{
                             context.message.rotation += frameChange;
-
                         } 
                     };
                     context.space.bind('update', gameover);
@@ -409,13 +515,16 @@
                     }
                     context.space.bind('update', merge);
                 }
+                
                 destroy()
                 {
                     this.space = undefined;
+                    this.sprite.remove();
                     this.sprite = undefined;
-                    this.value = undefined;
+                    this.message.remove();
                     this.message = undefined;
                 }
+                
                 animate_movement(moveTo, framesCount, flag)
                 {
                     let frameStep = { x: (moveTo.x - this.sprite.translation.x) / framesCount, y: (moveTo.y - this.sprite.translation.y) / framesCount };
@@ -447,6 +556,7 @@
                     this.space.bind('update', f);
 
                 }
+                
                 update()
                 {
                     this.message.value = this.value;
@@ -455,23 +565,58 @@
                 }
 
             };
-    
-    
+            
+
+            class Screen{
+                constructor()
+                {
+                    
+                }
+                attachControls()
+                {
+
+                }
+                destroy()
+                {
+
+                }
+            };
+
+            //End of definitive script section
         </script>
+
+
+
+
+
+        <!--Declaring separate sections for -->
         <div class="cont">
             
             <div class="topnav">
-                <a class="active barButton" href="">Home</a>
+                <button class="active barButton" onclick="switch_tab(event, 'home')">Home</button>
 
-                <a class="barButton" href="">News</a>
+                <button class="barButton" onclick="switch_tab(event, 'snd')">132</button>
 
-                <a class="barButton" href="">Contact</a>
+                <button class="barButton" onclick="switch_tab(event, 'settings')">Game</button>
 
-                <a class="barButton" href="">About</a>
+                <button class="barButton" onclick="switch_tab(event, 'draw')">Settings</button>
+                
             </div>
-            <div id="draw">
-                <script>
+            <div class = "content" id = "home">
+                
 
+            </div>
+            <div class = "content" id = "snd">
+
+
+            </div>
+            <div class = "content" id = "settings" >
+
+                
+            </div>
+            <div class = "content" id = "draw">
+                <script>
+                    
                     
                     let space = new Two( { width: elementSize, height: elementSize, type: Two.Types.webgl} )
                         
@@ -480,109 +625,83 @@
 
                     let field = new Field(space);
 
-                    let a0 = space.makeRoundedRectangle(100, 100, 100, 100, 20);
-                    a0.translation.set(-100, -100);
-                    a0 = undefined;
-
                     space.update();
-                    //space.play();
-                    let a = [[0,1], [1, 0], [0, -1], [-1, 0]];
 
-                    function func()
-                    {
-                        return Math.round(Math.random() * 3);
-                    }
-
-                    var btn = document.createElement("BUTTON");   // Create a <button> element
-                    btn.innerHTML = "CLICK ME";                   // Insert text
-                    document.getElementById('draw').append(btn);
-                    //btn.
-                    space.bind('update', function(){
-                        let x = func();
-                        if(field.animated())
-                            ;
-                        else
-                            field.move(a[x][0], a[x][1]);
-                            ;
-                    })
-
-                    window.addEventListener('click', function(){
-                        let x = func();
-                        //field.move(a[x][0], a[x][1]);
-                    });
                     
-                    window.addEventListener('keydown', function(event){
-                        switch(event.keyCode){
-                            case 37: 
-                                //left;
-                                if(field.animated())
-                                    ;
-                                else
-                                    field.move(-1, 0);
-                                break;
-                            case 38: 
-                                //up;
-                                if(field.animated())
-                                    ;
-                                else
-                                    field.move(0, -1);
-                                break;
-                            case 39:
-                                //right;
-                                if(field.animated())
-                                    ;
-                                else
-                                    field.move(1, 0);
-                                break;
-                            case 40:
-                                //down;
-                                if(field.animated())
-                                    ;
-                                else
-                                    field.move(0, 1);
-                                break;
-                            default:
-                                break;
-                        }
-                    });
+
                 </script>
             </div>
         <style>
-            /* Add a black background color to the top navigation */
+            body{
+                margin: 0 !important;
+                background-color: #444;
+            }
+            
             .topnav {
             background-color: #333;
+            outline-style: outset;
+            outline-width: 3px;
+            outline-color: cyan;
             overflow: hidden;
             }
-
-            /* Style the links inside the navigation bar */
-            .topnav a {
+            
+            .topnav button {
             float: left;
-            color: #f2f2f2;
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            color: azure;
             text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
+            padding: 9px 35px;
+            transition: 0.25s;
             font-size: 17px;
             }
-
-            /* Change the color of links on hover */
-            .topnav a:hover {
-            background-color: #ddd;
+            #draw{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                
+            }
+            
+            .topnav button.active {
+            background-color: cadetblue;
+            color: white;
+            }
+            
+            .topnav button:hover {
+            background-color: lightgray;
             color: black;
             }
 
-            /* Add a color to the active/current link */
-            .topnav a.active {
-            background-color: #4CAF50;
-            color: white;
-            }
-            #draw111 {
-                width: 660px;
-                height: 660px;
-                border-radius: 7%;
-                border: 10px solid darkcyan;
-                background: ivory;
-            }
+            
         </style>
         </div>
+        <script>
+            //console.dir(document.getElementsByClassName('content')[0]);
+            function switch_tab(event, tab)
+            {
+                let buttons = document.getElementsByClassName('barButton');
+                for(let each of buttons){
+                    each.classList.remove('active');
+                }
+                let tabs = document.getElementsByClassName('content');
+                for(let each of tabs){
+                    each.style.display = 'none';
+                }
+                document.getElementById(tab).style.display = 'block';
+                console.dir(event.currentTarget);
+                event.currentTarget.classList.push('active');
+            }
+        </script>
+
+
+
+
+        
+        <script>
+            
+        </script>
     </body>
 </html>
