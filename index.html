@@ -14,22 +14,20 @@
 
         <script>
             //Beginning of definitive script section
-            const width0  = window.innerWidth;
-            const width1 = document.documentElement.clientWidth;
-            const width2 = document.body.clientWidth;
-            const height0 = window.innerHeight;
-            const height1 = document.documentElement.clientHeight;
-            const height2 = document.body.clientHeight;
-            console.log(width0, height0);
-            console.log(width1, height1);
-            console.log(width2, height2);
+            let width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            console.log(width, height);
 
-
-            let fieldSize = 770;
-            let outlineWidth = 5;
+            let available_space = width > height ? height : width;
             let field_xbyx = 5;
+
+            let tileSize = Math.floor(Math.floor(available_space / field_xbyx / 1.5) / 6) * 6;
             
-            let tileSize = 130;
+            
+            let fieldSize = Math.ceil((available_space - Math.floor(available_space / 6)) / 10) * 10;
+            let outlineWidth = 5;
+            
+            
             let gap = 15;
 
             let elementSize = fieldSize + outlineWidth * 2;
@@ -37,12 +35,21 @@
             
             let margin = (elementSize - tileSize * field_xbyx - gap * (field_xbyx - 1) ) / 2 + tileSize / 2;
 
-            let color0 = {r: 245, g: 222, b: 179};
-            let color1 = {r: 139, g: 0, b: 0};
-            let r_diff = (color0.r - color1.r) / 7;
-            let g_diff = (color0.g - color1.g) / 7;
-            let b_diff = (color0.b - color1.b) / 7;
-            let counter = 0;
+
+            function setDimensions(xbyx)
+            {
+                width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                available_space = width > height ? height : width;
+                field_xbyx = xbyx;
+                tileSize = Math.floor(Math.floor(available_space / field_xbyx / 1.5) / 6) * 6;
+                fieldSize = Math.ceil((available_space - Math.floor(available_space / 6)) / 10) * 10;
+                outlineWidth = 5;
+                gap = 15;
+                elementSize = fieldSize + outlineWidth * 2;
+                step = tileSize + gap;
+                margin = (elementSize - tileSize * field_xbyx - gap * (field_xbyx - 1) ) / 2 + tileSize / 2;
+            }
 
             let colormap_tile = {2: 'blanchedalmond', 4: 'wheat', 8: 'rgb(231, 194,156)', 16: 'rgb(218,166,134)', 32: 'rgb(205,145,115)', 64: 'rgb(192,130,90)'
                 , 128: 'rgb(175,115,75)', 256: 'rgb(190,120,30)', 512: 'rgb(210,130,30)', 1024: 'rgb(130, 50, 50)', 2048: 'rgb(120, 30, 30)'};
@@ -83,12 +90,13 @@
                     this.tileSprites = [];
                     for(let i = 0; i < field_xbyx * field_xbyx; ++i){
 
-                        this.tileSprites[i] = (this.space.makeRoundedRectangle(i % 5 * step + margin, Math.floor(i / 5) * step + margin
+                        this.tileSprites[i] = 
+                            (this.space.makeRoundedRectangle(Math.round(i % field_xbyx * step + margin)
+                            , Math.round(Math.floor(i / field_xbyx) * step + margin)
                             , tileSize, tileSize));
                         this.tileSprites[i].fill = 'rgb(127,200,170)';
                         this.tileSprites[i].stroke = 'rgb(225,240,240)';
                     }
-
                     
                     //Creating tile
                     this.tiles = [];
@@ -103,7 +111,7 @@
                         do{
                             current = Math.floor(Math.random() * field_xbyx * field_xbyx);
                         }
-                        while(/*current % 5 == 0 || current % 5 == 4 || Math.floor(current / 5) == 0 || Math.floor(current / 5) == 4 ||*/ 
+                        while(/*current % field_xbyx == 0 || current % field_xbyx == 4 || Math.floor(current / field_xbyx) == 0 || Math.floor(current / field_xbyx) == 4 ||*/ 
                         this.tiles[current] !== null);
 
                         this.tiles[current] = new Tile(current, this.space);
@@ -202,7 +210,9 @@
                     if(horizontal < 0 || vertical < 0){
                         current = 0;
                     }
-                    else {current = 24;}
+                    else {
+                        current = Math.pow(field_xbyx, 2) - 1;
+                    }
                     
                     //Finding the first non-null tile 
                     while(this.tiles[current] === null){
@@ -213,38 +223,40 @@
                         //Move to the next tile in the parameter specified direction until the selected tile is not empty or out of field borders.
                         let target = current;
                         do{
-                            target += horizontal + vertical * 5;
+                            target += horizontal + vertical * field_xbyx;
                         }
                         while(this.tiles[target] === null && 
-                        (target % 5 === current % 5 && horizontal === 0 
-                        || Math.floor(target / 5) === Math.floor(current / 5) && vertical === 0));
+                        (target % field_xbyx === current % field_xbyx && horizontal === 0 
+                        || Math.floor(target / field_xbyx) === Math.floor(current / field_xbyx) && vertical === 0));
 
                         
                         //Revert the target one tile back against the parameter specified direction and move to the new target
                         tile_logic: if(
                         //If the tile is out of range or is not on the same row/column as the tile logic intends to move
                         typeof this.tiles[target] == 'undefined' 
-                        || !(target % 5 === current % 5 && horizontal === 0 || Math.floor(target / 5) === Math.floor(current / 5) && vertical === 0) 
+                        || !(target % field_xbyx === current % field_xbyx && horizontal === 0 
+                            || Math.floor(target / field_xbyx) === Math.floor(current / field_xbyx) && vertical === 0) 
                         //otherwise, in case value of not-null target is not the same as the one logic intends to move 
                         || (this.tiles[current].value === this.tiles[target].value ? false : true)
                         //lastly, if target tile has been merged during this move
                         || this.tiles[target].merged){
 
                             //Move the target tile one position back
-                            target -= horizontal + vertical * 5;
+                            target -= horizontal + vertical * field_xbyx;
                             //There should be no need to process and animate tiles given that target tile is the same as the one to move
                             if(target === current)
                                 break tile_logic;
 
                             
                             /*100 ms basic animation length + 50 ms per each tile between the original tile and position tile is moved to*/
-                            let animation_duration = 100 + ((Math.abs(target - current) % 5 == 0 ? Math.abs(target - current) / 5 : Math.abs(target - current) % 5) - 1) * 50;
+                            let animation_duration = 100 + ((Math.abs(target - current) % field_xbyx == 0 
+                                ? Math.abs(target - current) / field_xbyx : Math.abs(target - current) % field_xbyx) - 1) * 50;
                             
                             //Making the target tile have all the same values as current one and replacing the current tile with null 
                             [this.tiles[target], this.tiles[current]] = [this.tiles[current], this.tiles[target]];
 
-                            this.tiles[target].animate_movement(new Point(margin + step * (target % 5), margin + step * (Math.floor(target / 5)))
-                                
+                            this.tiles[target].animate_movement(new Point(Math.round(margin + step * (target % field_xbyx))
+                                , Math.round(margin + step * (Math.floor(target / field_xbyx))))
                                 , msToFrames(animation_duration));
 
                             
@@ -259,14 +271,16 @@
                         else if(this.tiles[current].value === this.tiles[target].value){
 
                             /*50 ms basic animation length + 50 ms per each tile between the original tile and position tile is moved to*/
-                            let animation_duration = 75 + ((Math.abs(target - current) % 5 == 0 ? Math.abs(target - current) / 5 : Math.abs(target - current) % 5) - 1) * 50;
+                            let animation_duration = 75 + ((Math.abs(target - current) % field_xbyx === 0 
+                                ? Math.abs(target - current) / field_xbyx : Math.abs(target - current) % field_xbyx) - 1) * 50;
                             
                             
                             //Removing the current tile from the field while still animating it
                             let disconnect = null;
                             [this.tiles[current], disconnect] = [disconnect, this.tiles[current]];
-                            (disconnect).animate_movement(new Point(margin + step * (target % 5), margin + step * (Math.floor(target / 5)))
-                            , msToFrames(animation_duration), true);
+                            (disconnect).animate_movement(new Point(Math.round(margin + step * (target % field_xbyx))
+                                , Math.round(margin + step * (Math.floor(target / field_xbyx))))
+                                , msToFrames(animation_duration), true);
                             
                             
                             //as well as double the target tile value and animate it with merging animation
@@ -436,7 +450,7 @@
                 constructor(position, space)
                 {
                     this.value = 2;
-                    let coords = {x: position % field_xbyx * step + margin, y: Math.floor(position / field_xbyx) * step + margin};
+                    let coords = {x: Math.round(position % field_xbyx * step + margin), y: Math.round(Math.floor(position / field_xbyx) * step + margin)};
                     //Defining drawing space
                     this.space = space;
                     
@@ -448,7 +462,7 @@
                     //Defining the value displayed over the tile
                     this.message = this.space.makeText(this.value, coords.x, coords.y);
                     this.message.fill = 'teal';
-                    this.message.size = 40;
+                    this.message.size = Math.floor(tileSize / 3);
                     
                     //Extra flags for the movement logic
                     this.moving = false;
@@ -567,15 +581,14 @@
             };
             
 
-            class Screen{
+            class ScreenAbstract{
                 constructor()
                 {
+                    if(new.target === 'ScreenAbstract')
+                        throw new TypeError('No possibility of instantiating abstract class');
                     
                 }
-                attachControls()
-                {
-
-                }
+                attachControls(){}
                 destroy()
                 {
 
@@ -586,22 +599,22 @@
         </script>
 
 
+        <div class="topnav">
+        <button style = "" class="active barButton" onclick="switch_tab(event, 'home')">Home</button>
 
+        <button class="barButton" onclick="switch_tab(event, 'snd')">132</button>
 
+        <button class="barButton" onclick="switch_tab(event, 'settings')">Game</button>
+
+        <button class="barButton" onclick="switch_tab(event, 'draw')">Settings</button>
+        </div>
 
         <!--Declaring separate sections for -->
-        <div class="cont">
+        <div class="container">
             
-            <div class="topnav">
-                <button class="active barButton" onclick="switch_tab(event, 'home')">Home</button>
-
-                <button class="barButton" onclick="switch_tab(event, 'snd')">132</button>
-
-                <button class="barButton" onclick="switch_tab(event, 'settings')">Game</button>
-
-                <button class="barButton" onclick="switch_tab(event, 'draw')">Settings</button>
+            
                 
-            </div>
+            
             <div class = "content" id = "home">
                 
 
@@ -617,8 +630,7 @@
             <div class = "content" id = "draw">
                 <script>
                     
-                    
-                    let space = new Two( { width: elementSize, height: elementSize, type: Two.Types.webgl} )
+                    let space = new Two( { width: elementSize, height: elementSize, type: Two.Types.svg} )
                         
                         .appendTo(document.getElementById('draw'));
 
@@ -633,46 +645,68 @@
             </div>
         <style>
             body{
-                margin: 0 !important;
+                margin: 0;
                 background-color: #444;
             }
-            
-            .topnav {
-            background-color: #333;
-            outline-style: outset;
-            outline-width: 3px;
-            outline-color: cyan;
-            overflow: hidden;
-            }
-            
-            .topnav button {
-            float: left;
-            background-color: inherit;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            color: azure;
-            text-align: center;
-            padding: 9px 35px;
-            transition: 0.25s;
-            font-size: 17px;
-            }
-            #draw{
+            .container{
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                
+            }
+            .topnav {
+                animation: accordeon 0.65s;
+                background-color: #333;
+                outline-style: outset;
+                outline-width: 3px;
+                outline-color: cyan;
+                overflow: hidden;
+            }
+            
+            .topnav button {
+                float: left;
+                background-color: inherit;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                color: azure;
+                text-align: center;
+                padding: 1vh 3%;
+                transition: 0.25s;
+                font-size: 17px;
+                margin-right: 1%;
+            }
+            .content {
+                position: static;
+                animation: fadeEffect 0.5s; /* Fading effect takes 1 second */
+            }
+            
+            @keyframes accordeon {
+                from{transform: translate(0%, -200%);}
+                to{transform: translate(0%, 0%)}
+            }
+            @keyframes accordeon_horizontal {
+                from{}
+                to{}
+            }
+            
+            /* Go from zero to full opacity */
+            @keyframes fadeEffect {
+                from {transform: translate(-180%, 0%);opacity: 0;}
+                to {opacity: 1;}
             }
             
             .topnav button.active {
             background-color: cadetblue;
+            animation: accordeon_horizontal 0.4s;
+            animation-iteration-count: 1;
             color: white;
             }
             
             .topnav button:hover {
             background-color: lightgray;
             color: black;
+            transform: scale(1.2);
             }
 
             
@@ -691,8 +725,8 @@
                     each.style.display = 'none';
                 }
                 document.getElementById(tab).style.display = 'block';
-                console.dir(event.currentTarget);
-                event.currentTarget.classList.push('active');
+                console.dir(event.currentTarget.classList);
+                event.currentTarget.classList.add('active');
             }
         </script>
 
