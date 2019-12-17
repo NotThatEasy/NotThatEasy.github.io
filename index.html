@@ -69,19 +69,6 @@
                     this.y = y;
                 }
             };
-
-            class animation_queue{
-                constructor()
-                {
-                    this.body = [];
-                }
-                next_animation(f)
-                {
-                    this.body.push(() => {
-                        f();
-                    });
-                }
-            };
     
             class Field{
                 constructor(space)
@@ -129,38 +116,18 @@
                     }
                     
                     this.keyListener = null;
-                    this.attachControls();
                     
-
+                    this.attach_keyboard_controls();
+                    this.attach_touch_controls();
                 }
 
 
                 //Method utilized to add controls to the in-game tiles and to make the game play itself
-                attachControls()
+                attach_keyboard_controls()
                 {
                     let context = this;
                     let LEFT = 37, RIGHT = 39, UP = 38, DOWN = 40;
                     let ENTER = 13;
-                    let autoplaying = false;
-                    //Array and function definition for autoplay
-                    let selector = [[0,1], [1, 0], [0, -1], [-1, 0]];
-                    function randomize()
-                    {
-                        return Math.round(Math.random() * 3);
-                    }
-                    //Autoplay function            
-                    function auto(){
-                        if(document.getElementById('game').style.display === 'none')
-                            return;
-
-                        let x = randomize();
-                        if(field.animated())
-                            ;
-                        else
-                            field.move(selector[x][0], selector[x][1]);
-                            ;
-                    }
-
                     this.keyListener = function(event){
                         if(document.getElementById('game').style.display === 'none')
                             return;
@@ -206,6 +173,62 @@
                         }
                     };
                     window.addEventListener('keydown', context.keyListener);
+                }
+                attach_touch_controls()
+                {
+                    
+                    this.cumulative_movement = {x: 0, y: 0};
+                    this.pointer_location = {x: null, y: null};
+                    
+                    let is_pointer_down = false;
+                    let context = this;
+                    let offset = {x: Math.floor((width - fieldSize - outlineWidth) / 2), y: Math.floor((height - fieldSize - outlineWidth) / 2)};
+                    
+                    function reset_cumulative(){
+                        context.cumulative_movement.x = 0;
+                        context.cumulative_movement.y = 0;  
+                    }
+                    if (window.PointerEvent) {
+                        // Add Pointer Event Listener
+                        document.addEventListener('pointerdown', (event) => {
+                            is_pointer_down = true;
+                            reset_cumulative();
+                            context.pointer_location = new Point(event.x, event.y);
+                        }, true);
+                        document.addEventListener('pointermove', (event) => {
+                            let tmp = context.cumulative_movement;
+                            context.cumulative_movement = { x: tmp.x + (event.x - context.pointer_location.x), y: tmp.y + (event.y - context.pointer_location.y) };
+                            context.pointer_location = {x: event.x, y: event.y};
+                            if(is_pointer_down){
+                                if(context.cumulative_movement.x > tileSize){
+                                    if(!context.animated())
+                                        context.move(1, 0);
+                                    reset_cumulative();
+                                }else if(context.cumulative_movement.y > tileSize){
+                                    if(!context.animated())
+                                        context.move(0, 1);
+                                    reset_cumulative();
+                                }else if(context.cumulative_movement.x < -tileSize){
+                                    if(!context.animated())
+                                        context.move(-1, 0);
+                                    reset_cumulative();
+                                }else if(context.cumulative_movement.y < -tileSize){
+                                    if(!context.animated())
+                                        context.move(0, -1);
+                                    reset_cumulative();
+                            };
+                            }
+                            
+
+
+                        }, true);
+                        document.addEventListener('pointerup', (event) =>{
+                            is_pointer_down = false;
+                        }, true);
+                        document.addEventListener('pointercancel', (event) => {
+                            is_pointer_down = false;
+                        }, true);
+                    }
                 }
                 
                 
@@ -553,7 +576,7 @@
                     this.message = undefined;
                 }
                 
-                animate_movement(moveTo, framesCount, flag)
+                animate_movement(moveTo, framesCount, should_destroy)
                 {
                     let frameStep = { x: (moveTo.x - this.sprite.translation.x) / framesCount, y: (moveTo.y - this.sprite.translation.y) / framesCount };
                     let context = this;
@@ -569,7 +592,7 @@
                             context.moving = false;
                             
                             
-                            if(typeof(flag) !== 'undefined'/* && flag*/){
+                            if(typeof(should_destroy) !== 'undefined'/* && should_destroy*/){
                                 context.sprite.remove();
                                 context.message.remove();
                                 context.destroy();
@@ -593,19 +616,17 @@
                 }
 
             };
-
+            
             //End of definitive script section
         </script>
 
 
-        <div class="topnav">
+        <div class="topnav noselect">
         <button class="barButton" onclick="switch_tab(event, 'home')">Home</button>
 
         <button class="barButton" onclick="switch_tab(event, 'snd')">132</button>
 
         <button class="barButton active" onclick="switch_tab(event, 'game')">Game</button>
-
-        <button class="barButton" onclick="switch_tab(event, 'settings')">Settings</button>
         </div>
 
         <!--Declaring separate sections for -->
@@ -620,8 +641,8 @@
 
 
             </div>
-            <div style = "display: block;" class = "content active tbl" id = "game">
-                <div id = "draw">
+            <div style = "display: block;" class = "content active1 noselect" id = "game">
+                <div id = "draw" onpointerdown = "startTouch(event, 'draw')">
                     <script>
                     
                         let space = new Two( { width: elementSize, height: elementSize, type: Two.Types.svg} )
@@ -639,9 +660,8 @@
                             field = new Field(space);
                             space.update();
                         }
+                        console.dir(document);
                         makeField(5);
-                        let x = new ScreenAbstract(space, 'peru', 'wheat');
-                        
     
                     </script>
                 </div>
@@ -649,11 +669,21 @@
         </div>
             
         <div class = "bottom_nav">
-            <button class = "barButton">123456</button>
+            <button class = "barButton" onclick="makeField(3)">3x3</button>
+            <button class = "barButton" onclick="makeField(4)">4x4</button>
+            <button class = "barButton" onclick="makeField(5)">5x5</button>
+            <button class = "barButton" onclick="makeField(6)">6x6</button>
         </div>
             
                 
         <style>
+            .noselect {
+                -webkit-user-select: none; /* Safari */
+                -moz-user-select: none; /* Old versions of Firefox */
+                -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+            }
             .bottom_nav {
                 animation: rev_accordeon 650ms;
                 bottom: 0;
@@ -666,10 +696,12 @@
             }
             body{
                 margin: 0;
+                touch-action: none;
                 overflow: hidden;
                 background-color: #444;
             }
             .container{
+                
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -699,7 +731,7 @@
             }
             .content {
                 position: static;
-                animation: fadeSlideIn 500ms; /* Fading effect takes 1 second */
+                animation: fadeSlideIn 500ms;
             }
             .right-slided {
                 float: right;
@@ -718,13 +750,19 @@
             transform: scale(1.2);
             }
             .out {
-                animation: fadeSlideOut 0.4s;
-
+                animation: fadeSlideOut 400ms;
+            }
+            .bottom_out {
+                animation: accordeon_out 500ms;
             }
             
             @keyframes accordeon {
                 from{transform: translate(0%, -200%);}
                 to{transform: translate(0%, 0%)}
+            }
+            @keyframes accordeon_out {
+                from{}
+                to{transform: translate(0%, 200%);}
             }
             @keyframes rev_accordeon {
                 from{transform: translate(0%, 200%);}
@@ -743,13 +781,24 @@
         </style>
         </div>
         <script>
+            let el = document.getElementById('draw');
+            
+            let switching = false;
+
             //console.dir(document.getElementsByClassName('content')[0]);
             function switch_tab(event, tab)
             {
+                if(switching){
+                    let tabs = document.getElementsByClassName('content');
+                    for(let each of tabs){
+                        each.style.display = 'none';
+                    }    
+                }
+                switching = true;
+                console.log('should not switch now');
                 let buttons = document.getElementsByClassName('barButton');
                 let tabs = document.getElementsByClassName('content');
                 window.scrollbars.visible = false;
-                console.dir(window);
                 for(let i = 0; i < buttons.length; ++i){
                     if(buttons[i].classList.contains('active')){
                         if(tabs[i] === document.getElementById(tab))
@@ -757,15 +806,28 @@
                         buttons[i].classList.remove('active');
                         tabs[i].classList.add('out');
                         setTimeout(() => {
+                            if(!switching)
+                                tabs[i].style.display = 'none';
                             
-                            console.dir(window);
-                            tabs[i].style.display = 'none';
                             tabs[i].classList.remove('out');
                         }, 300);
                     }
                         
                 }
+                if(tab !== 'game'){
+                    let bottom_nav = document.getElementsByClassName('bottom_nav')[0];
+                    bottom_nav.classList.add('bottom_out');
+                    setTimeout(() => {
+                        bottom_nav.style.display = 'none';
+                    }, 250);
+                } else {
+                    let bottom_nav = document.getElementsByClassName('bottom_nav')[0];
+                    bottom_nav.classList.remove('bottom_out');
+                    bottom_nav.style.display = 'block';
+
+                }
                 document.getElementById(tab).style.display = 'block';
+                setTimeout(() => switching = false, 500)
                 //console.dir(event.currentTarget.classList);
                 event.currentTarget.classList.add('active');
             }
