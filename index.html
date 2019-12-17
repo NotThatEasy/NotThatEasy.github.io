@@ -44,8 +44,6 @@
                 field_xbyx = xbyx;
                 tileSize = Math.floor(Math.floor(available_space / field_xbyx / 1.5) / 6) * 6;
                 fieldSize = Math.ceil((available_space - Math.floor(available_space / 6)) / 10) * 10;
-                outlineWidth = 5;
-                gap = 15;
                 elementSize = fieldSize + outlineWidth * 2;
                 step = tileSize + gap;
                 margin = (elementSize - tileSize * field_xbyx - gap * (field_xbyx - 1) ) / 2 + tileSize / 2;
@@ -70,13 +68,26 @@
                     this.x = x;
                     this.y = y;
                 }
-            }
+            };
+
+            class animation_queue{
+                constructor()
+                {
+                    this.body = [];
+                }
+                next_animation(f)
+                {
+                    this.body.push(() => {
+                        f();
+                    });
+                }
+            };
     
             class Field{
                 constructor(space)
                 {
 
-                    //Defining drawing space
+                    //Copying drawing space
                     this.space = space;
                     
                     
@@ -139,7 +150,7 @@
                     }
                     //Autoplay function            
                     function auto(){
-                        if(document.getElementById('draw').style.display === 'none')
+                        if(document.getElementById('game').style.display === 'none')
                             return;
 
                         let x = randomize();
@@ -151,7 +162,7 @@
                     }
 
                     this.keyListener = function(event){
-                        if(document.getElementById('draw').style.display === 'none')
+                        if(document.getElementById('game').style.display === 'none')
                             return;
 
                         switch(event.keyCode){
@@ -433,13 +444,16 @@
                     this.keyListener = undefined;
                     for(let each of this.tileSprites){
                         each.remove();
-                        //each = undefined;
+                        each = undefined;
                     }
                     this.tileSprites = undefined;
                     this._field.remove();
                     this._field = undefined;
                     for(let each of this.tiles){
-                        each.destroy();
+                        if(each !== null){
+                            each.destroy();
+                        }
+
                     }
                     this.tiles = undefined;
                 }
@@ -451,7 +465,7 @@
                 {
                     this.value = 2;
                     let coords = {x: Math.round(position % field_xbyx * step + margin), y: Math.round(Math.floor(position / field_xbyx) * step + margin)};
-                    //Defining drawing space
+                    //Copying drawing space
                     this.space = space;
                     
                     //Defining tile sprite
@@ -579,73 +593,80 @@
                 }
 
             };
-            
-
-            class ScreenAbstract{
-                constructor()
-                {
-                    if(new.target === 'ScreenAbstract')
-                        throw new TypeError('No possibility of instantiating abstract class');
-                    
-                }
-                attachControls(){}
-                destroy()
-                {
-
-                }
-            };
 
             //End of definitive script section
         </script>
 
 
         <div class="topnav">
-        <button style = "" class="active barButton" onclick="switch_tab(event, 'home')">Home</button>
+        <button class="barButton" onclick="switch_tab(event, 'home')">Home</button>
 
         <button class="barButton" onclick="switch_tab(event, 'snd')">132</button>
 
-        <button class="barButton" onclick="switch_tab(event, 'settings')">Game</button>
+        <button class="barButton active" onclick="switch_tab(event, 'game')">Game</button>
 
-        <button class="barButton" onclick="switch_tab(event, 'draw')">Settings</button>
+        <button class="barButton" onclick="switch_tab(event, 'settings')">Settings</button>
         </div>
 
         <!--Declaring separate sections for -->
         <div class="container">
             
             
-                
-            
-            <div class = "content" id = "home">
+            <div style="display: none;" class = "content" id = "home">
                 
 
             </div>
-            <div class = "content" id = "snd">
+            <div style="display: none;" class = "content" id = "snd">
 
 
             </div>
-            <div class = "content" id = "settings" >
-
-                
-            </div>
-            <div class = "content" id = "draw">
-                <script>
+            <div style = "display: block;" class = "content active tbl" id = "game">
+                <div id = "draw">
+                    <script>
                     
-                    let space = new Two( { width: elementSize, height: elementSize, type: Two.Types.svg} )
+                        let space = new Two( { width: elementSize, height: elementSize, type: Two.Types.svg} )
+                            
+                            .appendTo(document.getElementById('game'));
                         
-                        .appendTo(document.getElementById('draw'));
-
-
-                    let field = new Field(space);
-
-                    space.update();
-
-                    
-
-                </script>
+                        let field = null;
+                        function makeField(xbyx){
+                            setDimensions(xbyx);
+                            if(field !== null)
+                            {
+                                field.destroy();
+                                field = undefined;
+                            }
+                            field = new Field(space);
+                            space.update();
+                        }
+                        makeField(5);
+                        let x = new ScreenAbstract(space, 'peru', 'wheat');
+                        
+    
+                    </script>
+                </div>
             </div>
+        </div>
+            
+        <div class = "bottom_nav">
+            <button class = "barButton">123456</button>
+        </div>
+            
+                
         <style>
+            .bottom_nav {
+                animation: rev_accordeon 650ms;
+                bottom: 0;
+                width: 100%;
+                padding-top: 0.25%;
+                position: fixed;
+                background-color: #333;
+                outline-style: solid;
+                outline-color: darkcyan;
+            }
             body{
                 margin: 0;
+                overflow: hidden;
                 background-color: #444;
             }
             .container{
@@ -655,15 +676,15 @@
                 transform: translate(-50%, -50%);
             }
             .topnav {
-                animation: accordeon 0.65s;
+                animation: accordeon 650ms;
                 background-color: #333;
-                outline-style: outset;
+                outline-style: solid;
                 outline-width: 3px;
-                outline-color: cyan;
+                outline-color: darkcyan;
                 overflow: hidden;
             }
             
-            .topnav button {
+            .barButton {
                 float: left;
                 background-color: inherit;
                 border: none;
@@ -672,44 +693,53 @@
                 color: azure;
                 text-align: center;
                 padding: 1vh 3%;
-                transition: 0.25s;
+                transition: 250ms;
                 font-size: 17px;
                 margin-right: 1%;
             }
             .content {
                 position: static;
-                animation: fadeEffect 0.5s; /* Fading effect takes 1 second */
+                animation: fadeSlideIn 500ms; /* Fading effect takes 1 second */
             }
-            
-            @keyframes accordeon {
-                from{transform: translate(0%, -200%);}
-                to{transform: translate(0%, 0%)}
-            }
-            @keyframes accordeon_horizontal {
-                from{}
-                to{}
-            }
-            
-            /* Go from zero to full opacity */
-            @keyframes fadeEffect {
-                from {transform: translate(-180%, 0%);opacity: 0;}
-                to {opacity: 1;}
-            }
-            
-            .topnav button.active {
+            .right-slided {
+                float: right;
+                animation: slide_right 500ms;
+            }            
+            .barButton.active {
             background-color: cadetblue;
             animation: accordeon_horizontal 0.4s;
             animation-iteration-count: 1;
             color: white;
             }
             
-            .topnav button:hover {
+            .barButton:hover {
             background-color: lightgray;
             color: black;
             transform: scale(1.2);
             }
+            .out {
+                animation: fadeSlideOut 0.4s;
 
+            }
             
+            @keyframes accordeon {
+                from{transform: translate(0%, -200%);}
+                to{transform: translate(0%, 0%)}
+            }
+            @keyframes rev_accordeon {
+                from{transform: translate(0%, 200%);}
+                to{}
+            }
+            
+            /* Go from zero to full opacity */
+            @keyframes fadeSlideIn {
+                from {transform: translate(-180%, 0%);opacity: 0;}
+                to {opacity: 1;}
+            }
+            @keyframes fadeSlideOut {
+                from {opacity: 1;}
+                to {transform: translate(180%, 0%); opacity: 0;}
+            }            
         </style>
         </div>
         <script>
@@ -717,15 +747,26 @@
             function switch_tab(event, tab)
             {
                 let buttons = document.getElementsByClassName('barButton');
-                for(let each of buttons){
-                    each.classList.remove('active');
-                }
                 let tabs = document.getElementsByClassName('content');
-                for(let each of tabs){
-                    each.style.display = 'none';
+                window.scrollbars.visible = false;
+                console.dir(window);
+                for(let i = 0; i < buttons.length; ++i){
+                    if(buttons[i].classList.contains('active')){
+                        if(tabs[i] === document.getElementById(tab))
+                            continue;
+                        buttons[i].classList.remove('active');
+                        tabs[i].classList.add('out');
+                        setTimeout(() => {
+                            
+                            console.dir(window);
+                            tabs[i].style.display = 'none';
+                            tabs[i].classList.remove('out');
+                        }, 300);
+                    }
+                        
                 }
                 document.getElementById(tab).style.display = 'block';
-                console.dir(event.currentTarget.classList);
+                //console.dir(event.currentTarget.classList);
                 event.currentTarget.classList.add('active');
             }
         </script>
