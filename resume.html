@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <script  src = "scripts/twomin.js">
+            
+        </script>
+
+        <script src = "scripts/page.js"></script>
+        <title>pet proj</title>
+
+    </head>
+    <body>
+
+        <script>
+            //Beginning of definitive script section
+            let width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            console.log(width, height);
+
+            let available_space = width > height ? height : width;
+            let field_xbyx = 5;
+
+            let tileSize = Math.floor(Math.floor(available_space / field_xbyx / 1.5) / 6) * 6;
+            
+            
+            let fieldSize = Math.ceil((available_space - Math.floor(available_space / 6)) / 10) * 10;
+            let outlineWidth = 5;
+            
+            
+            let gap = 15;
+
+            let elementSize = fieldSize + outlineWidth * 2;
+            let step = tileSize + gap;
+            
+            let margin = (elementSize - tileSize * field_xbyx - gap * (field_xbyx - 1) ) / 2 + tileSize / 2;
+
+
+            function setDimensions(xbyx)
+            {
+                width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                available_space = width > height ? height : width;
+                field_xbyx = xbyx;
+                tileSize = Math.floor(Math.floor(available_space / field_xbyx / 1.5) / 6) * 6;
+                fieldSize = Math.ceil((available_space - Math.floor(available_space / 6)) / 10) * 10;
+                elementSize = fieldSize + outlineWidth * 2;
+                step = tileSize + gap;
+                margin = (elementSize - tileSize * field_xbyx - gap * (field_xbyx - 1) ) / 2 + tileSize / 2;
+            }
+
+            let colormap_tile = {2: 'blanchedalmond', 4: 'wheat', 8: 'rgb(231, 194,156)', 16: 'rgb(218,166,134)', 32: 'rgb(205,145,115)', 64: 'rgb(192,130,90)'
+                , 128: 'rgb(175,115,75)', 256: 'rgb(190,120,30)', 512: 'rgb(210,130,30)', 1024: 'rgb(130, 50, 50)', 2048: 'rgb(120, 30, 30)'};
+            
+            
+            
+    
+            //Function to convert milliseconds to specific number of frames assuming animation is 60 fps
+            function msToFrames(milliseconds)
+            {
+                return Math.floor(60 * milliseconds / 1000);
+            };
+
+            //Class for storing 2-vectors conveniently
+            class Point{
+                constructor(x, y)
+                {
+                    this.x = x;
+                    this.y = y;
+                }
+            };
+    
+            class Field{
+                constructor(space)
+                {
+
+                    //Copying drawing space
+                    this.space = space;
+                    
+                    
+                    //Defining background game field
+                    this._field = this.space.makeRoundedRectangle(fieldSize / 2 + outlineWidth, fieldSize / 2 + outlineWidth
+                    , fieldSize, fieldSize, fieldSize / 20);
+                    this._field._fill = 'rgb(225,240,240)';
+                    this._field._linewidth = outlineWidth;
+                    this._field._stroke = 'darkcyan';
+                    
+                    this.tileSprites = [];
+                    for(let i = 0; i < field_xbyx * field_xbyx; ++i){
+
+                        this.tileSprites[i] = 
+                            (this.space.makeRoundedRectangle(Math.round(i % field_xbyx * step + margin)
+                            , Math.round(Math.floor(i / field_xbyx) * step + margin)
+                            , tileSize, tileSize));
+                        this.tileSprites[i].fill = 'rgb(127,200,170)';
+                        this.tileSprites[i].stroke = 'rgb(225,240,240)';
+                    }
+                    
+                    //Creating tile
+                    this.tiles = [];
+                    for(let i = 0; i < field_xbyx * field_xbyx; ++i){
+
+                        this.tiles[i] = null;
+                    }
+                    
+                    for(let i = 0; i < 2; ++i){
+
+                        let current = null;
+                        do{
+                            current = Math.floor(Math.random() * field_xbyx * field_xbyx);
+                        }
+                        while(/*current % field_xbyx == 0 || current % field_xbyx == 4 || Math.floor(current / field_xbyx) == 0 || Math.floor(current / field_xbyx) == 4 ||*/ 
+                        this.tiles[current] !== null);
+
+                        this.tiles[current] = new Tile(current, this.space);
+                    }
+                    
+                    this.keyListener = null;
+                    
+                    this.attach_keyboard_controls();
+                    this.attach_touch_controls();
+                }
+
+
+                //Method utilized to add controls to the in-game tiles and to make the game play itself
+                attach_keyboard_controls()
+                {
+                    let context = this;
+                    let LEFT = 37, RIGHT = 39, UP = 38, DOWN = 40;
+                    let ENTER = 13;
+                    this.keyListener = function(event){
+                        if(document.getElementById('game').style.display === 'none')
+                            return;
+
+                        switch(event.keyCode){
+                            case ENTER:
+                                if(autoplaying){
+                                    autoplaying = false;
+                                    space.unbind('update', auto);
+                                }
+                                else{
+                                    autoplaying = true;
+                                    space.bind('update', auto);
+                                    space.play();
+                                }
+                                break;
+                            case LEFT: 
+                                //left;
+                                if(!context.animated()){
+                                    context.move(-1, 0);
+                                }
+                                break;
+                            case UP: 
+                                //up;
+                                if(!context.animated()){
+                                    context.move(0, -1);
+                                }
+                                break;
+                            case RIGHT:
+                                //right;
+                                if(!context.animated()){
+                                    context.move(1, 0);
+                                }
+                                break;
+                            case DOWN:
+                                //down;
+                                if(!context.animated()){
+                                    context.move(0, 1);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    };
+                    window.addEventListener('keydown', context.keyListener);
+                }
+                attach_touch_controls()
+                {
+                    
+                    this.cumulative_movement = {x: 0, y: 0};
+                    this.pointer_location = {x: null, y: null};
+                    
+                    let is_pointer_down = false;
+                    let context = this;
+                    let offset = {x: Math.floor((width - fieldSize - outlineWidth) / 2), y: Math.floor((height - fieldSize - outlineWidth) / 2)};
+                    
+                    function reset_cumulative(){
+                        context.cumulative_movement.x = 0;
+                        context.cumulative_movement.y = 0;  
+                    }
+                    if (window.PointerEvent) {
+                        // Add Pointer Event Listener
+                        document.addEventListener('pointerdown', (event) => {
+                            is_pointer_down = true;
+                            reset_cumulative();
+                            context.pointer_location = new Point(event.x, event.y);
+                        }, true);
+                        document.addEventListener('pointermove', (event) => {
+                            let tmp = context.cumulative_movement;
+                            context.cumulative_movement = { x: tmp.x + (event.x - context.pointer_location.x), y: tmp.y + (event.y - context.pointer_location.y) };
+                            context.pointer_location = {x: event.x, y: event.y};
+                            if(is_pointer_down){
+                                if(context.cumulative_movement.x > tileSize){
+                                    if(!context.animated())
+                                        context.move(1, 0);
+                                    reset_cumulative();
+                                }else if(context.cumulative_movement.y > tileSize){
+                                    if(!context.animated())
+                                        context.move(0, 1);
+                                    reset_cumulative();
+                                }else if(context.cumulative_movement.x < -tileSize){
+                                    if(!context.animated())
+                                        context.move(-1, 0);
+                                    reset_cumulative();
+                                }else if(context.cumulative_movement.y < -tileSize){
+                                    if(!context.animated())
+                                        context.move(0, -1);
+                                    reset_cumulative();
+                            };
+                            }
+                            
+
+
+                        }, true);
+                        document.addEventListener('pointerup', (event) =>{
+                            is_pointer_down = false;
+                        }, true);
+                        document.addEventListener('pointercancel', (event) => {
+                            is_pointer_down = false;
+                        }, true);
+                    }
+                }
+                
+                
+                /*
+                 * Method to move the tiles on user input
+                 */
+                move(horizontal, vertical)
+                {
+                    //Time of the animation after which new tile can be spawned
+                    let maxTime = 0;
+                    //"Current" tile is the tile decisions and computations are made relative to
+                    let current;
+                    if(horizontal < 0 || vertical < 0){
+                        current = 0;
+                    }
+                    else {
+                        current = Math.pow(field_xbyx, 2) - 1;
+                    }
+                    
+                    //Finding the first non-null tile 
+                    while(this.tiles[current] === null){
+                        current -= horizontal + vertical;
+                    }
+                    //Process the tiles until it turns out next one would be out of range. This marks all tiles have been processed
+                    while(this.tiles[current] !== undefined){
+                        //Move to the next tile in the parameter specified direction until the selected tile is not empty or out of field borders.
+                        let target = current;
+                        do{
+                            target += horizontal + vertical * field_xbyx;
+                        }
+                        while(this.tiles[target] === null && 
+                        (target % field_xbyx === current % field_xbyx && horizontal === 0 
+                        || Math.floor(target / field_xbyx) === Math.floor(current / field_xbyx) && vertical === 0));
+
+                        
+                        //Revert the target one tile back against the parameter specified direction and move to the new target
+                        tile_logic: if(
+                        //If the tile is out of range or is not on the same row/column as the tile logic intends to move
+                        typeof this.tiles[target] == 'undefined' 
+                        || !(target % field_xbyx === current % field_xbyx && horizontal === 0 
+                            || Math.floor(target / field_xbyx) === Math.floor(current / field_xbyx) && vertical === 0) 
+                        //otherwise, in case value of not-null target is not the same as the one logic intends to move 
+                        || (this.tiles[current].value === this.tiles[target].value ? false : true)
+                        //lastly, if target tile has been merged during this move
+                        || this.tiles[target].merged){
+
+                            //Move the target tile one position back
+                            target -= horizontal + vertical * field_xbyx;
+                            //There should be no need to process and animate tiles given that target tile is the same as the one to move
+                            if(target === current)
+                                break tile_logic;
+
+                            
+                            /*100 ms basic animation length + 50 ms per each tile between the original tile and position tile is moved to*/
+                            let animation_duration = 100 + ((Math.abs(target - current) % field_xbyx == 0 
+                                ? Math.abs(target - current) / field_xbyx : Math.abs(target - current) % field_xbyx) - 1) * 50;
+                            
+                            //Making the target tile have all the same values as current one and replacing the current tile with null 
+                            [this.tiles[target], this.tiles[current]] = [this.tiles[current], this.tiles[target]];
+
+                            this.tiles[target].animate_movement(new Point(Math.round(margin + step * (target % field_xbyx))
+                                , Math.round(margin + step * (Math.floor(target / field_xbyx))))
+                                , msToFrames(animation_duration));
+
+                            
+                            //Updating the time needed to pass before spawning a new tile
+                            if(animation_duration > maxTime){
+                                maxTime = animation_duration;
+                            }
+                       }
+                        
+
+                        //Moving to and merging with the target tile
+                        else if(this.tiles[current].value === this.tiles[target].value){
+
+                            /*50 ms basic animation length + 50 ms per each tile between the original tile and position tile is moved to*/
+                            let animation_duration = 75 + ((Math.abs(target - current) % field_xbyx === 0 
+                                ? Math.abs(target - current) / field_xbyx : Math.abs(target - current) % field_xbyx) - 1) * 50;
+                            
+                            
+                            //Removing the current tile from the field while still animating it
+                            let disconnect = null;
+                            [this.tiles[current], disconnect] = [disconnect, this.tiles[current]];
+                            (disconnect).animate_movement(new Point(Math.round(margin + step * (target % field_xbyx))
+                                , Math.round(margin + step * (Math.floor(target / field_xbyx))))
+                                , msToFrames(animation_duration), true);
+                            
+                            
+                            //as well as double the target tile value and animate it with merging animation
+                            this.tiles[target].value *= 2;
+                            this.tiles[target].merging = true;
+                            this.tiles[target].merged = true;
+                            setTimeout(()=>{
+                                try{
+                                    this.tiles[target].animate_merge(msToFrames(100));
+                                }
+                                catch(error){
+                                    console.dir(error);
+                                }
+                                
+                            }, animation_duration);
+
+
+                            //Update the time needed to pass before spawning a new tile
+                            if(animation_duration > maxTime)
+                                maxTime = animation_duration + 100;
+                        }
+                        //Searching for the next tile
+                        do{
+                            current -= horizontal + vertical;
+                        }
+                        while(this.tiles[current] === null);
+
+                    }
+                    //Resetting the tiles that have been merged on the current move
+                    for(let each of this.tiles)
+                        if(each !== null)
+                            each.merged = false;
+                    
+                    switch(this.is_game_over()){
+                        case 1:
+
+                            break;
+                        case 0: 
+                            let context = this;
+                            if(maxTime !== 0){
+                                setTimeout(function(){ context.spawn_tile(msToFrames(100)); }, maxTime);                                
+                            }
+                                
+                            break;
+                        case -1: 
+                            break;
+
+                    }
+
+                    this.space.play();
+                    //setTimeout(space.pause, maxTime + 100);
+                    
+                }
+                
+
+                is_game_over()
+                {
+                    for(let each of this.tiles)
+                        if(each !== null && each.value === 2048)
+                        {
+                            each.animate_gameover();
+                            return 1;
+                        }
+                    if(this.full()){
+                        if(this.no_moves()){
+                            return -1;
+                        }
+                    }
+                    return 0;
+                }
+
+                //Method to check if there are any moves eligible for making
+                no_moves()
+                {
+                    let passed = [];
+                    //helper function to decide whether the compared tiles are valid and equal
+                    function ok(context, one, another)
+                    {
+                        if(typeof context.tiles[another] !== 'undefined'){
+                            if(context.tiles[one] === context.tiles[another]){
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+
+                    //Compare each tile with its neighbors
+                    for(let i = 0; i < 25; ++i){
+                        if(ok(this, i, i-1) || ok(this, i, i + 1) || ok(this, i, i - field_xbyx) || ok(this, i, i + field_xbyx)){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+
+                //Method to check if the field is filled with tiles completely
+                full()
+                {
+                    for(const any of this.tiles)
+                        if(any === null)
+                            return false;
+                    return true;
+                }
+
+
+                //Method to check if any of the field's tiles are animated
+                animated()
+                {
+                    for(const any of this.tiles)
+                        if(any !== null && (any.moving || any.merging || any.gameovering || any.spawning))
+                            return true;
+                    return false;
+                }
+
+                //Create a new tile on the field by selecting a random non-filled tile and creating a new one there
+                spawn_tile(frames)
+                {
+                    let current = null;
+                    do{
+                        current = Math.floor(Math.random() * 25);
+                    }
+                    while(this.tiles[current] !== null);
+                    this.tiles[current] = new Tile(current, this.space);
+                    this.tiles[current].sprite.scale = 0;
+                    this.tiles[current].spawning = true;
+
+                    let context = this;
+                    let frameStep = 1 / frames;
+                    let spawner = function(){
+
+                        if(frames === 0){
+                            context.tiles[current].sprite.scale = 1;
+                            context.space.unbind('update', spawner);
+                            context.space.update();
+                            context.tiles[current].spawning = false;
+                        }
+                        else{
+                            --frames;
+                            context.tiles[current].sprite.scale += frameStep;
+                        }
+                    };
+                    this.space.bind('update', spawner);
+                }
+
+                destroy()
+                {
+                    this.space = undefined;
+                    window.removeEventListener('keydown', this.keyListener);
+                    this.keyListener = undefined;
+                    for(let each of this.tileSprites){
+                        each.remove();
+                        each = undefined;
+                    }
+                    this.tileSprites = undefined;
+                    this._field.remove();
+                    this._field = undefined;
+                    for(let each of this.tiles){
+                        if(each !== null){
+                            each.destroy();
+                        }
+
+                    }
+                    this.tiles = undefined;
+                }
+            };
+
+
+            class Tile{
+                constructor(position, space)
+                {
+                    this.value = 2;
+                    let coords = {x: Math.round(position % field_xbyx * step + margin), y: Math.round(Math.floor(position / field_xbyx) * step + margin)};
+                    //Copying drawing space
+                    this.space = space;
+                    
+                    //Defining tile sprite
+                    this.sprite = space.makeRoundedRectangle(coords.x, coords.y, tileSize, tileSize);
+                    this.sprite.fill = colormap_tile[this.value];
+                    this.sprite.stroke = colormap_tile[this.value];
+
+                    //Defining the value displayed over the tile
+                    this.message = this.space.makeText(this.value, coords.x, coords.y);
+                    this.message.fill = 'teal';
+                    this.message.size = Math.floor(tileSize / 3);
+                    
+                    //Extra flags for the movement logic
+                    this.moving = false;
+                    this.merging = false;
+                    this.merged = false;
+                    this.gameovering = false;
+                    this.spawning = false;
+
+                }
+
+                //Definition of function that plays upon reaching 2048
+                animate_gameover()
+                {
+                    let context = this;
+                    this.gameovering = true;
+                    let frameChange = 0.05;
+
+                    let gameover = function()
+                    {
+                        if(typeof context.final !== 'undefined' && context.final){
+                            context.space.unbind('update', gameover);
+                            context.moving = false;
+                            context.gameovering = false;
+                            context.merging = false;
+                        }
+                        else{
+                            context.message.rotation += frameChange;
+                        } 
+                    };
+                    context.space.bind('update', gameover);
+                }
+
+                //Animation of tile merging
+                animate_merge(framesCount)
+                {
+                    let context = this;
+                    let threshold = Math.round(framesCount / 2);
+                    let frameChange = 0.2 / framesCount * 2;
+                    this.merging = true;
+                    let merge = function(){
+                            if(framesCount === 0)
+                        {
+                            --framesCount;
+                            context.sprite.scale = 1;
+                            context.message.scale = 1;
+                            context.space.unbind('update', merge);
+                            context.merging = false;
+                        }
+                        else{
+                            if(framesCount > threshold){
+                                context.sprite.scale = context.sprite.scale + frameChange;
+                                context.message.scale = context.message.scale + frameChange * 2;
+                            }
+                            else{
+                                context.update();
+                                context.sprite.scale = context.sprite.scale - frameChange;
+                                context.message.scale = context.message.scale - frameChange * 2;
+                            }
+                                
+                            
+                            --framesCount;
+                            
+                        }
+                    }
+                    context.space.bind('update', merge);
+                }
+                
+                destroy()
+                {
+                    this.space = undefined;
+                    this.sprite.remove();
+                    this.sprite = undefined;
+                    this.message.remove();
+                    this.message = undefined;
+                }
+                
+                animate_movement(moveTo, framesCount, should_destroy)
+                {
+                    let frameStep = { x: (moveTo.x - this.sprite.translation.x) / framesCount, y: (moveTo.y - this.sprite.translation.y) / framesCount };
+                    let context = this;
+                    this.moving = true;
+                    let f = function()
+                    {
+                        if(framesCount === 0){
+                            --framesCount;
+                            context.sprite.translation.set(moveTo.x, moveTo.y);
+                            context.message.translation.set(moveTo.x, moveTo.y);
+                            context.space.unbind('update', f);
+                            //Not sure this needs to be updated
+                            context.moving = false;
+                            
+                            
+                            if(typeof(should_destroy) !== 'undefined'/* && should_destroy*/){
+                                context.sprite.remove();
+                                context.message.remove();
+                                context.destroy();
+                            }
+                        }
+                        else if(framesCount > 0){
+                            --framesCount;
+                            context.sprite.translation.set(context.sprite.translation.x + frameStep.x, context.sprite.translation.y + frameStep.y);
+                            context.message.translation.set(context.sprite.translation.x + frameStep.x, context.sprite.translation.y + frameStep.y);
+                        }
+                    };
+                    this.space.bind('update', f);
+
+                }
+                
+                update()
+                {
+                    this.message.value = this.value;
+                    this.sprite.fill = colormap_tile[this.value];
+                    this.sprite.stroke = colormap_tile[this.value];
+                }
+
+            };
+            
+            //End of definitive script section
+        </script>
+
+
+        <div class="topnav noselect">
+        <button class="barButton" onclick="switch_tab(event, 'home')">Home</button>
+
+        <button class="barButton" onclick="switch_tab(event, 'snd')">132</button>
+
+        <button class="barButton active" onclick="switch_tab(event, 'game')">Game</button>
+        </div>
+
+        <!--Declaring separate sections for -->
+        <div class="container">
+            
+            
+            <div style="display: none;" class = "content" id = "home">
+                
+
+            </div>
+            <div style="display: none;" class = "content" id = "snd">
+
+
+            </div>
+            <div style = "display: block;" class = "content active1 noselect" id = "game">
+                <div id = "draw" onpointerdown = "startTouch(event, 'draw')">
+                    <script>
+                    
+                        let space = new Two( { width: elementSize, height: elementSize, type: Two.Types.svg} )
+                            
+                            .appendTo(document.getElementById('game'));
+                        
+                        let field = null;
+                        let regening = false;
+                        function makeField(xbyx){
+                            setDimensions(xbyx);
+                            if(field !== null)
+                            {
+                                let game = document.getElementById('game');
+                                game.classList.add('out');
+                                setTimeout(() => {
+                                    field.destroy();
+                                    field = undefined;
+                                    game.classList.remove('out');
+                                    game.style.display = 'none';
+                                    field = new Field(space);
+                                    game.style.display = 'block';
+                                    space.update();
+                                }, 400);
+                                
+                            }
+                            else{
+                                field = new Field(space);
+                                space.update();
+                            }
+                        }
+                        console.dir(document);
+                        makeField(5);
+    
+                    </script>
+                </div>
+            </div>
+        </div>
+            
+        <div class = "bottom_nav">
+            <button class = "barButton" onclick="makeField(3)">3x3</button>
+            <button class = "barButton" onclick="makeField(4)">4x4</button>
+            <button class = "barButton" onclick="makeField(5)">5x5</button>
+            <button class = "barButton" onclick="makeField(6)">6x6</button>
+        </div>
+            
+                
+        <style>
+            .noselect {
+                -webkit-user-select: none; /* Safari */
+                -moz-user-select: none; /* Old versions of Firefox */
+                -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+            }
+            .bottom_nav {
+                animation: rev_accordeon 650ms;
+                bottom: 0;
+                width: 100%;
+                padding-top: 0.25%;
+                position: fixed;
+                background-color: #333;
+                outline-style: solid;
+                outline-color: darkcyan;
+            }
+            body{
+                margin: 0;
+                touch-action: none;
+                overflow: hidden;
+                background-color: #444;
+            }
+            .container{
+                
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .topnav {
+                animation: accordeon 650ms;
+                background-color: #333;
+                outline-style: solid;
+                outline-width: 3px;
+                outline-color: darkcyan;
+                overflow: hidden;
+            }
+            
+            .barButton {
+                float: left;
+                background-color: inherit;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                color: azure;
+                text-align: center;
+                padding: 1vh 3%;
+                transition: 250ms;
+                font-size: 17px;
+                margin-right: 1%;
+            }
+            .content {
+                position: static;
+                animation: fadeSlideIn 500ms;
+            }
+            .right-slided {
+                float: right;
+                animation: slide_right 500ms;
+            }            
+            .barButton.active {
+            background-color: cadetblue;
+            animation: accordeon_horizontal 0.4s;
+            animation-iteration-count: 1;
+            color: white;
+            }
+            
+            .barButton:hover {
+            background-color: lightgray;
+            color: black;
+            transform: scale(1.2);
+            }
+            .out {
+                animation: fadeSlideOut 400ms;
+            }
+            .bottom_out {
+                animation: accordeon_out 500ms;
+            }
+            
+            @keyframes accordeon {
+                from{transform: translate(0%, -200%);}
+                to{transform: translate(0%, 0%)}
+            }
+            @keyframes accordeon_out {
+                from{}
+                to{transform: translate(0%, 200%);}
+            }
+            @keyframes rev_accordeon {
+                from{transform: translate(0%, 200%);}
+                to{}
+            }
+            
+            /* Go from zero to full opacity */
+            @keyframes fadeSlideIn {
+                from {transform: translate(-180%, 0%);opacity: 0;}
+                to {opacity: 1;}
+            }
+            @keyframes fadeSlideOut {
+                from {opacity: 1;}
+                to {transform: translate(180%, 0%); opacity: 0;}
+            }            
+        </style>
+        </div>
+        <script>
+            let el = document.getElementById('draw');
+            
+            let switching = 0;
+
+            //console.dir(document.getElementsByClassName('content')[0]);
+            function switch_tab(event, tab)
+            {
+                if(switching){
+                    let tabs = document.getElementsByClassName('content');
+                    for(let each of tabs){
+                        each.style.display = 'none';
+                    }    
+                }
+                ++switching;
+                console.log('should not switch now');
+                let buttons = document.getElementsByClassName('barButton');
+                let tabs = document.getElementsByClassName('content');
+                window.scrollbars.visible = false;
+                for(let i = 0; i < buttons.length; ++i){
+                    if(buttons[i].classList.contains('active')){
+                        if(tabs[i] === document.getElementById(tab))
+                            continue;
+                        buttons[i].classList.remove('active');
+                        tabs[i].classList.add('out');
+                        setTimeout(() => {
+                            if(switching < 2)
+                                tabs[i].style.display = 'none';
+                            
+                            tabs[i].classList.remove('out');
+                        }, 300);
+                    }
+                        
+                }
+                if(tab !== 'game'){
+                    let bottom_nav = document.getElementsByClassName('bottom_nav')[0];
+                    bottom_nav.classList.add('bottom_out');
+                    setTimeout(() => {
+                        bottom_nav.style.display = 'none';
+                    }, 250);
+                } else {
+                    let bottom_nav = document.getElementsByClassName('bottom_nav')[0];
+                    bottom_nav.classList.remove('bottom_out');
+                    bottom_nav.style.display = 'block';
+
+                }
+                document.getElementById(tab).style.display = 'block';
+                setTimeout(() => --switching, 500)
+                //console.dir(event.currentTarget.classList);
+                event.currentTarget.classList.add('active');
+            }
+        </script>
+
+
+
+
+        
+        <script>
+            
+        </script>
+    </body>
+</html>
