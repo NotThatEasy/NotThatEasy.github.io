@@ -783,7 +783,7 @@
         <script>
             let el = document.getElementById('draw');
             
-            let switching = false;
+            let switching = 0;
 
             //console.dir(document.getElementsByClassName('content')[0]);
             function switch_tab(event, tab)
@@ -794,7 +794,7 @@
                         each.style.display = 'none';
                     }    
                 }
-                switching = true;
+                ++switching;
                 console.log('should not switch now');
                 let buttons = document.getElementsByClassName('barButton');
                 let tabs = document.getElementsByClassName('content');
@@ -806,7 +806,7 @@
                         buttons[i].classList.remove('active');
                         tabs[i].classList.add('out');
                         setTimeout(() => {
-                            if(!switching)
+                            if(switching < 2)
                                 tabs[i].style.display = 'none';
                             
                             tabs[i].classList.remove('out');
@@ -827,7 +827,7 @@
 
                 }
                 document.getElementById(tab).style.display = 'block';
-                setTimeout(() => switching = false, 500)
+                setTimeout(() => --switching, 500)
                 //console.dir(event.currentTarget.classList);
                 event.currentTarget.classList.add('active');
             }
