@@ -721,7 +721,7 @@
             }
             body{
                 margin: 0;
-                touch-action: none;
+                /*touch-action: none;*/
                 overflow: auto;
                 background-color: #444;
             }
@@ -811,7 +811,6 @@
             //console.dir(document.getElementsByClassName('content')[0]);
             function switch_tab(event, tab)
             {
-                document.body.touch_action='auto';
                 if(switching){
                     let tabs = document.getElementsByClassName('content');
                     for(let each of tabs){
@@ -848,7 +847,6 @@
                     let bottom_nav = document.getElementsByClassName('bottom_nav')[0];
                     bottom_nav.classList.remove('bottom_out');
                     bottom_nav.style.display = 'block';
-                    document.body.touch_action='none';
                 }
                 document.getElementById(tab).style.display = 'block';
                 setTimeout(() => --switching, 500)
