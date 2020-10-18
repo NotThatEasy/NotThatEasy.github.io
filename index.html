@@ -3,10 +3,8 @@
     <head>
 
         <script  src = "scripts/twomin.js">
-            
         </script>
 
-        <script src = "scripts/page.js"></script>
         <title>pet proj</title>
 
     </head>
@@ -38,6 +36,7 @@
 
             function setDimensions(xbyx)
             {
+                
                 width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
                 height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
                 available_space = width > height ? height : width;
@@ -622,16 +621,16 @@
 
 
         <div class="topnav noselect">
-        <button class="barButton" onclick="switch_tab(event, 'home')">Home</button>
+        <button class="barButton active" onclick="switch_tab(event, 'home')">Home</button>
 
-        <button class="barButton active" onclick="switch_tab(event, 'game')">Game</button>
+        <button class="barButton" onclick="switch_tab(event, 'game')">Game</button>
         </div>
 
         <!--Declaring separate sections for -->
         <div class="container">
             
             
-            <div style="display: none; float: left; margin: 50px 50px 50px 50px; color: #F0F0F0" class = "content" id = "home">
+            <div style="display: block; float: left; margin: 50px 50px 50px 50px; color: #F0F0F0" class = "content" id = "home">
                 <h1 style="text-align: center;">Мальшаков Никита</h1>
                     
                     Личные данные:<br>
@@ -666,7 +665,7 @@
 
             </div>
 
-            <div style = "display: block;" class = "content active1 noselect" id = "game">
+            <div style = "display: none" class = "content active1 noselect" id = "game">
                 <div id = "draw" onpointerdown = "startTouch(event, 'draw')">
                     <script>
                     
@@ -693,7 +692,7 @@
             </div>
         </div>
             
-        <div class = "bottom_nav">
+        <div class = "bottom_nav" style = "display: none;">
             <button class = "barButton" onclick="makeField(3)">3x3</button>
             <button class = "barButton" onclick="makeField(4)">4x4</button>
             <button class = "barButton" onclick="makeField(5)">5x5</button>
@@ -804,6 +803,7 @@
         </style>
         </div>
         <script>
+
             let el = document.getElementById('draw');
             
             let switching = 0;
@@ -818,7 +818,6 @@
                     }    
                 }
                 ++switching;
-                console.log('should not switch now');
                 let buttons = document.getElementsByClassName('barButton');
                 let tabs = document.getElementsByClassName('content');
                 window.scrollbars.visible = false;
