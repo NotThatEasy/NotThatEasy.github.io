@@ -2,7 +2,11 @@
 <html>
     <head>
 
-        <script src = "scripts/twomin.js"></script>
+        <script  src = "scripts/twomin.js">
+            
+        </script>
+
+        <script src = "scripts/page.js"></script>
         <title>pet proj</title>
 
     </head>
@@ -620,41 +624,33 @@
         <div class="topnav noselect">
         <button class="barButton" onclick="switch_tab(event, 'home')">Резюме</button>
 
-        <button class="barButton" onclick="switch_tab(event, 'snd')">CV</button>
-
-        <button class="barButton active" onclick="switch_tab(event, 'game')">Game</button>
+        <button class="barButton active" onclick="switch_tab(event, 'game')">Игра в 2048</button>
         </div>
 
         <!--Declaring separate sections for -->
         <div class="container">
             
             
-            <div style="display: none;" class = "content" id = "home">
+            <div style="display: none; float: left; padding: 50px 30px 30px 0px; color: #F0F0F0" class = "content" id = "home">
             <h1 style="text-align: center;">Мальшаков Никита</h1>
                 
                 Личные данные:<br>
                 Место проживания:	г. Николаев, пр. Богоявленский, д. 28<br>
                 Дата рождения:		25.03.1998(22 полных года)<br>
                 Семейный статус:	холост, детей нет<br>
-
-
-
-
-
-
                 Образование: 	полное среднее, неоконченное высшее.<br>
                 ВУЗ: 			Национальный аэрокосмический университет им. Н.Е. Жуковского “Харьковский авиационный институт” (завершил учёбу на 4-м курсе).<br>
                 Специальность:			Компьютерные науки.<br>
-                Доп. образование:		Курсы английского “My Way”, г. Николаев, где обучался в течение 10 лет.<br>
+                Доп. образование:		Курсы английского “My Way”, г. Николаев, где обучался в течение 10 лет.<br><br>
 
                 Контактная информация:<br>
                 Контактный телефон:		+38 068 432 80 58<br>
-                Адрес электронной почты:	bm.zitter@gmail.com<br>
+                Адрес электронной почты:	bm.zitter@gmail.com<br><br>
 
                 Цель трудоустройства:<br>
                 Вакансия:				Эксперт по настройке и сервисным обращениям.<br>
                 Предпочтительный график:	Работа с гибким графиком.<br>
-                Опыт работы:			Интернатура по работе с компьютерным зрением на языке C++ в Chi software, год работы в качестве англоязычного специалиста-консультанта в сфере SSL-сертификации/специалиста по поддержке англоязычных клиентов.<br>
+                Опыт работы:			Интернатура по работе с компьютерным зрением на языке C++ в Chi software, год работы в качестве англоязычного специалиста-консультанта в сфере SSL-сертификации/специалиста по поддержке англоязычных клиентов.<br><br>
                 Знание иностранных языков:<br>
                 Родные языки – русский и украинский. Знание английского на уровне Advanced, включая business English; владение языком на уровне B2 подтверждено сертификатом FCE. Занимался курсами английского в течение 10 лет параллельно со школьной программой.<br>
                 Владение информацией о мобильных устройствах:<br>
@@ -665,12 +661,8 @@
                 Тяготею к программированию – пишу на таких языках, как C++ (junior уровень), JavaScript со сторонними фреймворками, чистый PHP, Python. В стане функциональных языков изучал Haskell; завершил 20 задач из цикла “Project Euler” на языках C++, Python, Haskell.<br>
                 В программировании более всего интересовался и занимался разработкой двумерных игр и компьютерной программируемой графикой.<br>
                 Интерес к C++ и играм подстегнул углубиться в высокопроизводительные, многопоточные вычисления на C++ и, в частности, открытую библиотеку компьютерного зрения OpenCV.<br>
-                Интересуюсь юнит- и авто-тестированиями, хоть и не имел развёрнутого опыта их применения. В курсе основных принципов ООП и руководствуюсь ими в ООП-ориентированных языках и ООП-ориентированных задачах.<br>
-
-            </div>
-            <div style="display: none;" class = "content" id = "snd">
-
-
+                Интересуюсь юнит- и авто-тестированиями, хоть и не имел развёрнутого опыта их применения. В курсе основных принципов ООП и руководствуюсь ими в ООП-ориентированных языках и ООП-ориентированных задачах.
+                
             </div>
             <div style = "display: block;" class = "content active1 noselect" id = "game">
                 <div id = "draw" onpointerdown = "startTouch(event, 'draw')">
@@ -729,7 +721,7 @@
             body{
                 margin: 0;
                 touch-action: none;
-                overflow: hidden;
+                overflow-x: hidden;
                 background-color: #444;
             }
             .container{
@@ -827,10 +819,9 @@
                     }    
                 }
                 ++switching;
-                console.log('should not switch now');
                 let buttons = document.getElementsByClassName('barButton');
                 let tabs = document.getElementsByClassName('content');
-                window.scrollbars.visible = false;
+                //window.scrollbars.visible = false;
                 for(let i = 0; i < buttons.length; ++i){
                     if(buttons[i].classList.contains('active')){
                         if(tabs[i] === document.getElementById(tab))
@@ -852,7 +843,9 @@
                     setTimeout(() => {
                         bottom_nav.style.display = 'none';
                     }, 250);
+                    //document.body.overflow="auto";
                 } else {
+                    //document.body.overflow="hidden";
                     let bottom_nav = document.getElementsByClassName('bottom_nav')[0];
                     bottom_nav.classList.remove('bottom_out');
                     bottom_nav.style.display = 'block';
