@@ -721,7 +721,7 @@
             }
             body{
                 margin: 0;
-                /*touch-action: none;*/
+                touch-action: none;
                 overflow: auto;
                 background-color: #444;
             }
@@ -842,12 +842,13 @@
                     bottom_nav.classList.add('bottom_out');
                     setTimeout(() => {
                         bottom_nav.style.display = 'none';
+                        document.body.touch_action='auto';
                     }, 250);
                 } else {
                     let bottom_nav = document.getElementsByClassName('bottom_nav')[0];
                     bottom_nav.classList.remove('bottom_out');
                     bottom_nav.style.display = 'block';
-
+                    document.body.touch_action='none';
                 }
                 document.getElementById(tab).style.display = 'block';
                 setTimeout(() => --switching, 500)
