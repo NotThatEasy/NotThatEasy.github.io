@@ -811,6 +811,7 @@
             //console.dir(document.getElementsByClassName('content')[0]);
             function switch_tab(event, tab)
             {
+                document.body.touch_action='auto';
                 if(switching){
                     let tabs = document.getElementsByClassName('content');
                     for(let each of tabs){
@@ -842,7 +843,6 @@
                     bottom_nav.classList.add('bottom_out');
                     setTimeout(() => {
                         bottom_nav.style.display = 'none';
-                        document.body.touch_action='auto';
                     }, 250);
                 } else {
                     let bottom_nav = document.getElementsByClassName('bottom_nav')[0];
