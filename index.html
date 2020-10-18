@@ -2,8 +2,6 @@
 <html>
     <head>
 
-        <!--<script  src = "scripts/twomin.js"></script>-->
-
         <script src = "scripts/page.js"></script>
         <title>pet proj</title>
 
@@ -144,25 +142,25 @@
                                 break;
                             case LEFT: 
                                 //left;
-                                if(!context.animated()){
+                                if(!context.is_animated()){
                                     context.move(-1, 0);
                                 }
                                 break;
                             case UP: 
                                 //up;
-                                if(!context.animated()){
+                                if(!context.is_animated()){
                                     context.move(0, -1);
                                 }
                                 break;
                             case RIGHT:
                                 //right;
-                                if(!context.animated()){
+                                if(!context.is_animated()){
                                     context.move(1, 0);
                                 }
                                 break;
                             case DOWN:
                                 //down;
-                                if(!context.animated()){
+                                if(!context.is_animated()){
                                     context.move(0, 1);
                                 }
                                 break;
@@ -199,19 +197,19 @@
                             context.pointer_location = {x: event.x, y: event.y};
                             if(is_pointer_down){
                                 if(context.cumulative_movement.x > tileSize){
-                                    if(!context.animated())
+                                    if(!context.is_animated())
                                         context.move(1, 0);
                                     reset_cumulative();
                                 }else if(context.cumulative_movement.y > tileSize){
-                                    if(!context.animated())
+                                    if(!context.is_animated())
                                         context.move(0, 1);
                                     reset_cumulative();
                                 }else if(context.cumulative_movement.x < -tileSize){
-                                    if(!context.animated())
+                                    if(!context.is_animated())
                                         context.move(-1, 0);
                                     reset_cumulative();
                                 }else if(context.cumulative_movement.y < -tileSize){
-                                    if(!context.animated())
+                                    if(!context.is_animated())
                                         context.move(0, -1);
                                     reset_cumulative();
                             };
@@ -420,7 +418,7 @@
 
 
                 //Method to check if any of the field's tiles are animated
-                animated()
+                is_animated()
                 {
                     for(const any of this.tiles)
                         if(any !== null && (any.moving || any.merging || any.gameovering || any.spawning))
@@ -620,9 +618,9 @@
 
 
         <div class="topnav noselect">
-        <button class="barButton" onclick="switch_tab(event, 'home')">Home</button>
+        <button class="barButton" onclick="switch_tab(event, 'home')">Резюме</button>
 
-        <button class="barButton" onclick="switch_tab(event, 'snd')">132</button>
+        <button class="barButton" onclick="switch_tab(event, 'snd')">CV</button>
 
         <button class="barButton active" onclick="switch_tab(event, 'game')">Game</button>
         </div>
@@ -632,7 +630,42 @@
             
             
             <div style="display: none;" class = "content" id = "home">
+            <h1 style="text-align: center;">Мальшаков Никита</h1>
                 
+                Личные данные:<br>
+                Место проживания:	г. Николаев, пр. Богоявленский, д. 28<br>
+                Дата рождения:		25.03.1998(22 полных года)<br>
+                Семейный статус:	холост, детей нет<br>
+
+
+
+
+
+
+                Образование: 	полное среднее, неоконченное высшее.<br>
+                ВУЗ: 			Национальный аэрокосмический университет им. Н.Е. Жуковского “Харьковский авиационный институт” (завершил учёбу на 4-м курсе).<br>
+                Специальность:			Компьютерные науки.<br>
+                Доп. образование:		Курсы английского “My Way”, г. Николаев, где обучался в течение 10 лет.<br>
+
+                Контактная информация:<br>
+                Контактный телефон:		+38 068 432 80 58<br>
+                Адрес электронной почты:	bm.zitter@gmail.com<br>
+
+                Цель трудоустройства:<br>
+                Вакансия:				Эксперт по настройке и сервисным обращениям.<br>
+                Предпочтительный график:	Работа с гибким графиком.<br>
+                Опыт работы:			Интернатура по работе с компьютерным зрением на языке C++ в Chi software, год работы в качестве англоязычного специалиста-консультанта в сфере SSL-сертификации/специалиста по поддержке англоязычных клиентов.<br>
+                Знание иностранных языков:<br>
+                Родные языки – русский и украинский. Знание английского на уровне Advanced, включая business English; владение языком на уровне B2 подтверждено сертификатом FCE. Занимался курсами английского в течение 10 лет параллельно со школьной программой.<br>
+                Владение информацией о мобильных устройствах:<br>
+                Ориентируюсь в производителях мобильных аппаратов, ноутбуков, комплектующих ПК, их технических характеристиках. Имел опыт множественной перепрошивки телефона, изменения заводских параметров, установки рута, рекавери, переустановки операционных систем на базе Windows и Linux на ПК и ноутбуке. Занимался разработкой графических приложений под ПК на базе Windows, а также под смартфоны. На предыдущем месте работы имел опыт удалённой настройки серверов и консультации клиентов посредством онлайн-чатов на английском языке. Не имел опыта коммерческого ремонта потребительского оборудования.<br>
+                Навыки работы с компьютером:<br>
+                Работаю в операционной среде Windows 10, владею базисными офисными программами. Присутствует также опыт работы в среде Linux (Mint) в качестве основной ОС, а также Linux-серверами. В случае чего, всегда готов к всестороннему изучению новых окружений и средств. В курсе университетской программы имел опыт обращения с программными продуктами MS Office/LibreOffice, по большей части Word/Writer.<br>
+                Имею опыт работы с SolidWorks на уровне университетского курса, работал с AutoCAD. Имел университетский опыт работы со статистическим анализом данных при помощи компьютерных программ.<br>
+                Тяготею к программированию – пишу на таких языках, как C++ (junior уровень), JavaScript со сторонними фреймворками, чистый PHP, Python. В стане функциональных языков изучал Haskell; завершил 20 задач из цикла “Project Euler” на языках C++, Python, Haskell.<br>
+                В программировании более всего интересовался и занимался разработкой двумерных игр и компьютерной программируемой графикой.<br>
+                Интерес к C++ и играм подстегнул углубиться в высокопроизводительные, многопоточные вычисления на C++ и, в частности, открытую библиотеку компьютерного зрения OpenCV.<br>
+                Интересуюсь юнит- и авто-тестированиями, хоть и не имел развёрнутого опыта их применения. В курсе основных принципов ООП и руководствуюсь ими в ООП-ориентированных языках и ООП-ориентированных задачах.<br>
 
             </div>
             <div style="display: none;" class = "content" id = "snd">
@@ -675,6 +708,7 @@
             
                 
         <style>
+            
             .noselect {
                 -webkit-user-select: none; /* Safari */
                 -moz-user-select: none; /* Old versions of Firefox */
@@ -753,7 +787,7 @@
             .bottom_out {
                 animation: accordeon_out 500ms;
             }
-            
+            /*CSS animation styles*/
             @keyframes accordeon {
                 from{transform: translate(0%, -200%);}
                 to{transform: translate(0%, 0%)}
