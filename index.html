@@ -4,16 +4,133 @@
 
         <script  src = "scripts/twomin.js">
         </script>
+        <style>
+            @font-face {
+                font-family: Leelawadee;
+                src: url("LeelawUI.ttf");
+            }
+            *{
+                font-family: Leelawadee, Verdana, Tahoma;
+            }
+            .noselect {
+                -webkit-user-select: none; /* Safari */
+                -moz-user-select: none; /* Old versions of Firefox */
+                -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+            }
+            .bottom_nav {
+                animation: rev_accordeon 650ms;
+                bottom: 0;
+                width: 100%;
+                padding-top: 0.25%;
+                position: fixed;
+                background-color: #333;
+                outline-style: solid;
+                outline-color: #529ed6;
+            }
+            body{
+                margin: 0;
+                overflow: auto;
+                background-color: #1e1e1e;
+                color: white;
+            }
+            .container{
+                
+                /*position: absolute;
+                margin: auto;*/
+            }
+            .topnav {
+                animation: accordeon 650ms;
+                background-color: #333;
+                outline-style: solid;
+                outline-width: 3px;
+                outline-color: #529ed6;
+                overflow: hidden;
+            }
+            
+            .barButton {
+                float: left;
+                background-color: inherit;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                color: azure;
+                text-align: center;
+                padding: 1vh 3%;
+                transition: 250ms;
+                font-size: 17px;
+                margin-right: 1%;
+            }
+            .content {
+                position: absolute;
+                padding: 0% 15% 10% 10%;
+                animation: fadeSlideIn 500ms;
+            }
+            #game {
+                padding: 15px 0px 0px;
+            }
+            .right-slided {
+                float: right;
+                animation: slide_right 500ms;
+            }            
+            .barButton.active {
+            background-color: #529ed6;
+            animation: accordeon_horizontal 0.4s;
+            animation-iteration-count: 1;
+            color: white;
+            }
+            
+            .barButton:hover {
+            background-color: lightgray;
+            color: black;
+            transform: scale(1.2);
+            }
+            .out {
+                animation: fadeSlideOut 400ms;
+            }
+            .bottom_out {
+                animation: accordeon_out 500ms;
+            }
+            .green {
+                color: #4acbb5;
+            }
+            .blue {
+                color: #529ed6;
+            }
+            @keyframes accordeon {
+                from{transform: translate(0%, -200%);}
+                to{transform: translate(0%, 0%)}
+            }
+            @keyframes accordeon_out {
+                from{}
+                to{transform: translate(0%, 200%);}
+            }
+            @keyframes rev_accordeon {
+                from{transform: translate(0%, 200%);}
+                to{}
+            }
+            
+            /* Go from zero to full opacity */
+            @keyframes fadeSlideIn {
+                from {transform: translate(-180%, 0%);opacity: 0;}
+                to {opacity: 1;}
+            }
+            @keyframes fadeSlideOut {
+                from {opacity: 1;}
+                to {transform: translate(180%, 0%); opacity: 0;}
+            }            
+        </style>
 
-        <title>pet proj</title>
+        <title>Резюме</title>
 
     </head>
     <body>
 
         <script>
             //Beginning of definitive script section
-            let width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-            let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            let width  = document.documentElement.clientWidth || document.body.clientWidth || window.innerWidth;
+            let height = document.documentElement.clientHeight || document.body.clientHeight || window.innerHeight;
             console.log(width, height);
 
             let available_space = width > height ? height : width;
@@ -91,7 +208,7 @@
                             (this.space.makeRoundedRectangle(Math.round(i % field_xbyx * step + margin)
                             , Math.round(Math.floor(i / field_xbyx) * step + margin)
                             , tileSize, tileSize));
-                        this.tileSprites[i].fill = 'rgb(127,200,170)';
+                        this.tileSprites[i].fill = 'darkcyan';
                         this.tileSprites[i].stroke = 'rgb(225,240,240)';
                     }
                     
@@ -621,38 +738,75 @@
 
 
         <div class="topnav noselect">
-        <button class="barButton active" onclick="switch_tab(event, 'home')">Резюме</button>
-
-        <button class="barButton" onclick="switch_tab(event, 'game')">Игра в 2048</button>
+        <button class="barButton active" onclick="switch_tab(event, 'eng')">CV</button>
+        <button class="barButton" onclick="switch_tab(event, 'home')">Резюме</button>
+        <button class="barButton" onclick="switch_tab(event, 'game')">2048</button>
         </div>
 
-        <!--Declaring separate sections for -->
+        <!--Declaring separate sections for tabs in container-->
         <div class="container">
-            
-            
-            <div style="display: block; float: left; margin: 50px 50px 50px 50px; color: #F0F0F0" class = "content" id = "home">
-                <h1 style="text-align: center;">Мальшаков Никита</h1>
+            <div style="display: block; float: left; margin: 50px 50px 50px 50px; color: #F0F0F0" class = "content" id = "eng">
+                <h1 style="text-align: center;" class="green">Nikita Malshakov</h1><br>
+                <div class="green">Personal data:</div>
+                <span class="blue">Residentship:</span>			Mykolayiv, Bohoyavlensky ave., 28, apt. 18<br>
+                <span class="blue">Date of birth:</span>			25.03.1998(22 years)<br>
+                <span class="blue">Marital status:</span>			single, no children<br><br>
+
+                <span class="blue">Education:</span> 			    high school graduate<br>
+                <span class="blue">University:</span> 			National University of Shipbuilding<br>
+                <span class="blue">Specialty:</span>				Computer sciences<br>
+                <span class="blue">Certifications:</span>			English level B2 certified  with an FCE certificate<br><br>
+
+                <div class="green">Contact details:</div>
+                <span class="blue">Cell phone number:</span>		+38 068 432 80 58<br>
+                <span class="blue">E-mail address:</span>			malshakov.n@gmail.com<br>
+                <span class="blue">CV website:</span>			notthateasy.github.io<br>
+
+                <div class="green">Work expectations:</div>
+                <span class="blue">Position:</span>				Customer support specialist in e-mail and chats.<br>
+                <span class="blue">Schedule:</span>				Working in 8-hour shifts.<br>
+                <span class="blue">Work experience:</span>	There is a previous experience of year of working in shifts as an English-speaking Customer Support specialist employed with Namecheap. 
+                                    Working as a customer support specialist proved to be an interesting job as well as the one I could handle.<br><br>
+                <div class="green">Knowledge of languages:</div>
+                Native Russian and Ukrainian speaker with an assessed English level of B2-C1, whereas B2 level of English is certified with an FCE certificate of grade B. 
+                Former Customer Support specialist with fluency in written English (chats and e-mails) as well as skills in Business English necessary when contacting both customers and colleagues.
+                <div class="green">PC-related hard skills:</div>
+                    A Windows 10 user that is acquainted with basic office programs such as Microsoft Word and Excel.
+                    There is also an experience of working with Linux Mint as the main operating system for the PC as well as advising customers remotely on their machines running Linux or Windows operating systems.
+                    Moderately experienced in working with server machines.<br>
+
+                    An experienced user of Kayako chat and ticket system in supporting customers, who also can multitask in order to deliver the customer the best experience possible.
+                    Good with the tools required to communicate with the team, e.g. for solving peculiar problems.<br>
+
+                    Student programmer with some experience in such languages as C++ (junior level), and beginner level programmer in such languages as JavaScript, Python, Haskell. 
+                    Have completed 20 Project Euler’s problems using all three languages as follows: C++, Python, Haskell. 
+                    Most experience gained in programming is in the computer graphics field as well as 2D computer gaming one.<br><br>
+                <div class="green">Soft skills:</div>
+                    A person oriented to deliver customer smooth and effortless perception of the product as well as the web environment they will use; 
+                    able to come up with solutions that ought to be satisfying for the customer as well as justifiable for the company.<br>
+            </div>
+
+            <div style="display: none; float: left; margin: 50px 50px 50px 50px; color: #F0F0F0" class = "content" id = "home">
+                <h1 style="text-align: center;" class="green">Мальшаков Никита</h1>
                     
-                    Личные данные:<br>
-                    Место проживания:	г. Николаев, пр. Богоявленский, д. 28<br>
-                    Дата рождения:		25.03.1998(22 полных года)<br>
-                    Семейный статус:	холост, детей нет<br>
-                    Образование: 	полное среднее, неоконченное высшее.<br>
-                    ВУЗ: 			Национальный аэрокосмический университет им. Н.Е. Жуковского “Харьковский авиационный институт” (завершил учёбу на 4-м курсе).<br>
-                    Специальность:			Компьютерные науки.<br>
-                    Доп. образование:		Курсы английского “My Way”, г. Николаев, где обучался в течение 10 лет.<br><br>
+                    <div class="green">Личные данные:</div>
+                    <span class="blue">Место проживания:</span> <span class="shifted">г. Николаев, пр. Богоявленский, д. 28</span><br>
+                    <span class="blue">Дата рождения:</span> <span class="shifted">25.03.1998(22 полных года)</span><br>
+                    <span class="blue">Семейный статус:</span> <span class="shifted">холост, детей нет</span><br>
+                    <span class="blue">Образование:</span> <span class="shifted">полное среднее, неоконченное высшее.</span><br>
+                    <span class="blue">ВУЗ:</span> <span class="shifted">Национальный аэрокосмический университет им. Н.Е. Жуковского “Харьковский авиационный институт” (завершил учёбу на 4-м курсе).</span><br>
+                    <span class="blue">Специальность:</span> <span class="shifted">Компьютерные науки.</span><br>
+                    <span class="blue">Доп. образование:</span> <span class="shifted">Курсы английского “My Way”, г. Николаев, где обучался в течение 10 лет.</span><br><br>
     
-                    Контактная информация:<br>
-                    Контактный телефон:		+38 068 432 80 58<br>
-                    Адрес электронной почты:	bm.zitter@gmail.com<br><br>
+                    <span class="green">Контактная информация:</span><br>
+                    <span class="blue">Контактный телефон:</span> +38 068 432 80 58<br>
+                    <span class="blue">Адрес электронной почты:</span> bm.zitter@gmail.com<br><br>
     
-                    Предпочтительный график:	Работа с гибким графиком.<br>
-                    Опыт работы:			Интернатура по работе с компьютерным зрением на языке C++ в Chi software, год работы в качестве англоязычного специалиста-консультанта в сфере SSL-сертификации/специалиста по поддержке англоязычных клиентов.<br><br>
-                    Знание иностранных языков:<br>
+                    <span class="blue">Предпочтительный график:</span>	Работа с гибким графиком.<br>
+                    <span class="blue">Опыт работы:</span>Интернатура по работе с компьютерным зрением на языке C++ в Chi software, год работы в качестве англоязычного специалиста-консультанта в сфере SSL-сертификации/специалиста по поддержке англоязычных клиентов.<br><br>
+                    <span class="green">Знание иностранных языков:</span><br>
                     Родные языки – русский и украинский. Знание английского на уровне Advanced, включая business English; владение языком на уровне B2 подтверждено сертификатом FCE. Занимался курсами английского в течение 10 лет параллельно со школьной программой.<br>
-                    Владение информацией о мобильных устройствах:<br>
-                    Ориентируюсь в производителях мобильных аппаратов, ноутбуков, комплектующих ПК, их технических характеристиках. Имел опыт множественной перепрошивки телефона, изменения заводских параметров, установки рута, рекавери, переустановки операционных систем на базе Windows и Linux на ПК и ноутбуке. Занимался разработкой графических приложений под ПК на базе Windows, а также под смартфоны. На предыдущем месте работы имел опыт удалённой настройки серверов и консультации клиентов посредством онлайн-чатов на английском языке. Не имел опыта коммерческого ремонта потребительского оборудования.<br>
-                    Навыки работы с компьютером:<br>
+                    <span class="green">Навыки работы с компьютером:</span><br>
                     Работаю в операционной среде Windows 10, владею базисными офисными программами. Присутствует также опыт работы в среде Linux (Mint) в качестве основной ОС, а также Linux-серверами. В случае чего, всегда готов к всестороннему изучению новых окружений и средств. В курсе университетской программы имел опыт обращения с программными продуктами MS Office/LibreOffice, по большей части Word/Writer.<br>
                     Имею опыт работы с SolidWorks на уровне университетского курса, работал с AutoCAD. Имел университетский опыт работы со статистическим анализом данных при помощи компьютерных программ.<br>
                     Тяготею к программированию – пишу на таких языках, как C++ (junior уровень), JavaScript, чистый PHP, Python. Завершил 20 задач из цикла “Project Euler” на языках C++, Python, Haskell.<br>
@@ -662,6 +816,7 @@
                     
 
             </div>
+
 
             <div style = "display: none; touch-action: none;" class = "content active1 noselect" id = "game">
                 <div id = "draw" onpointerdown = "startTouch(event, 'draw')">
@@ -698,107 +853,7 @@
         </div>
             
                 
-        <style>
-            .noselect {
-                -webkit-user-select: none; /* Safari */
-                -moz-user-select: none; /* Old versions of Firefox */
-                -ms-user-select: none; /* Internet Explorer/Edge */
-                user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Opera and Firefox */
-            }
-            .bottom_nav {
-                animation: rev_accordeon 650ms;
-                bottom: 0;
-                width: 100%;
-                padding-top: 0.25%;
-                position: fixed;
-                background-color: #333;
-                outline-style: solid;
-                outline-color: darkcyan;
-            }
-            body{
-                margin: 0;
-                /*touch-action: none;*/
-                overflow: auto;
-                background-color: #444;
-            }
-            .container{
-                
-                position: absolute;
-                margin: auto;
-            }
-            .topnav {
-                animation: accordeon 650ms;
-                background-color: #333;
-                outline-style: solid;
-                outline-width: 3px;
-                outline-color: darkcyan;
-                overflow: hidden;
-            }
-            
-            .barButton {
-                float: left;
-                background-color: inherit;
-                border: none;
-                outline: none;
-                cursor: pointer;
-                color: azure;
-                text-align: center;
-                padding: 1vh 3%;
-                transition: 250ms;
-                font-size: 17px;
-                margin-right: 1%;
-            }
-            .content {
-                position: static;
-                animation: fadeSlideIn 500ms;
-            }
-            .right-slided {
-                float: right;
-                animation: slide_right 500ms;
-            }            
-            .barButton.active {
-            background-color: cadetblue;
-            animation: accordeon_horizontal 0.4s;
-            animation-iteration-count: 1;
-            color: white;
-            }
-            
-            .barButton:hover {
-            background-color: lightgray;
-            color: black;
-            transform: scale(1.2);
-            }
-            .out {
-                animation: fadeSlideOut 400ms;
-            }
-            .bottom_out {
-                animation: accordeon_out 500ms;
-            }
-            
-            @keyframes accordeon {
-                from{transform: translate(0%, -200%);}
-                to{transform: translate(0%, 0%)}
-            }
-            @keyframes accordeon_out {
-                from{}
-                to{transform: translate(0%, 200%);}
-            }
-            @keyframes rev_accordeon {
-                from{transform: translate(0%, 200%);}
-                to{}
-            }
-            
-            /* Go from zero to full opacity */
-            @keyframes fadeSlideIn {
-                from {transform: translate(-180%, 0%);opacity: 0;}
-                to {opacity: 1;}
-            }
-            @keyframes fadeSlideOut {
-                from {opacity: 1;}
-                to {transform: translate(180%, 0%); opacity: 0;}
-            }            
-        </style>
+        
         </div>
         <script>
 
