@@ -105,8 +105,10 @@
             #eng > div:before,
             #eng > span:before {
                 counter-increment: line;
-                content: counter(line);
+                content: counter(line) "--";
                 display: inline-block;
+                color: rgba(255, 255, 255, 0.6);
+                padding-right: 1em;
             }
             @keyframes accordeon {
                 from{transform: translate(0%, -200%);}
