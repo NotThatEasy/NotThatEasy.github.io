@@ -12,13 +12,6 @@
             *{
                 font-family: Leelawadee, Verdana, Tahoma;
             }
-            .noselect {
-                -webkit-user-select: none; /* Safari */
-                -moz-user-select: none; /* Old versions of Firefox */
-                -ms-user-select: none; /* Internet Explorer/Edge */
-                user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Opera and Firefox */
-            }
             .bottom_nav {
                 animation: rev_accordeon 650ms;
                 bottom: 0;
@@ -34,11 +27,6 @@
                 overflow: auto;
                 background-color: #1e1e1e;
                 color: white;
-            }
-            .container{
-                
-                /*position: absolute;
-                margin: auto;*/
             }
             .topnav {
                 animation: accordeon 650ms;
@@ -736,7 +724,7 @@
         </script>
 
 
-        <div class="topnav noselect">
+        <div class="topnav">
         <button class="barButton active" onclick="switch_tab(event, 'eng')">CV</button>
         <button class="barButton" onclick="switch_tab(event, 'home')">Резюме</button>
         <button class="barButton" onclick="switch_tab(event, 'game')">2048</button>
@@ -744,7 +732,7 @@
 
         <!--Declaring separate sections for tabs in container-->
         <div class="container">
-            <div style="display: block; float: left; margin: 50px 50px 50px 50px; color: #F0F0F0" class = "content" id = "eng">
+            <div class = "content" id = "eng">
                 <h1 style="text-align: center;" class="green">Nikita Malshakov</h1><br>
                 <div class="green">Personal data:</div>
                 <span class="blue">Residentship:</span>			Mykolayiv, Bohoyavlensky ave., 28, apt. 18<br>
@@ -784,7 +772,7 @@
                     A courteous person, able to think under pressure as well as being deadline-oriented and result-driven.<br>
             </div>
 
-            <div style="display: none; float: left; margin: 50px 50px 50px 50px; color: #F0F0F0" class = "content" id = "home">
+            <div style="display: none;" class = "content" id = "home">
                 <h1 style="text-align: center;" class="green">Мальшаков Никита</h1>
                     
                     <div class="green">Личные данные:</div>
@@ -816,7 +804,7 @@
             </div>
 
 
-            <div style = "display: none; touch-action: none;" class = "content active1 noselect" id = "game">
+            <div style="display: none; touch-action: none;" class = "content" id = "game">
                 <div id = "draw" onpointerdown = "startTouch(event, 'draw')">
                     <script>
                     
