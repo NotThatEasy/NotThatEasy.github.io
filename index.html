@@ -99,7 +99,6 @@
             }
             #home, #eng {
                 counter-reset: line;
-                text-indent: -40px;
             }
             #home > div:before,
             #home > span:before,
@@ -110,6 +109,12 @@
                 display: inline-block;
                 color: rgba(255, 255, 255, 0.6);
                 padding-right: 1em;
+            }
+            #home > div,
+            #home > span,
+            #eng > div,
+            #eng > span {
+                text-indent: -40px
             }
             @keyframes accordeon {
                 from{transform: translate(0%, -200%);}
