@@ -97,23 +97,6 @@
             .blue {
                 color: #529ed6;
             }
-            #home, #eng {
-                counter-reset: line;
-            }
-            #home > div:before,
-            #home > span:before,
-            #eng > div:before,
-            #eng > span:before {
-                counter-increment: line;
-                content: counter(line) " - -&nbsp;";
-                display: inline-block;
-                color: rgba(255, 255, 255, 0.6);
-            }
-            #home > div,
-            #home > span,
-            #eng > div,
-            #eng > span {
-            }
             @keyframes accordeon {
                 from{transform: translate(0%, -200%);}
                 to{transform: translate(0%, 0%)}
