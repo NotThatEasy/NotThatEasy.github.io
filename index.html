@@ -55,6 +55,8 @@
                 animation: fadeSlideIn 500ms;
             }
             #game {
+                touch-action: none;
+                overscroll-behavior: none;
                 padding: 15px 0px 0px;
             }
             .right-slided {
@@ -804,7 +806,7 @@
             </div>
 
 
-            <div style="display: none; touch-action: none;" class = "content" id = "game">
+            <div style="display: none;" class = "content" id = "game">
                 <div id = "draw" onpointerdown = "startTouch(event, 'draw')">
                     <script>
                     
