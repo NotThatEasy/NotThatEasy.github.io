@@ -737,7 +737,7 @@
 
         <!--Declaring separate sections for tabs in container-->
         <div class="container">
-            <div class = "content" id = "eng">
+            <div style="display:none; justify-content: center;" class = "content" id = "eng">
                 <h1 style="text-align: center;" class="green">Nikita Malshakov</h1><br>
                 <div class="green">Personal data:</div>
                 <span class="blue">Residentship:</span>			Mykolayiv, Bohoyavlensky ave., 28, apt. 18<br>
@@ -777,7 +777,7 @@
                     A courteous person, able to think under pressure as well as being deadline-oriented and result-driven.<br>
             </div>
 
-            <div style="display: none;" class = "content" id = "home">
+            <div style="display: none; justify-content: center;" class = "content" id = "home">
                 <h1 style="text-align: center;" class="green">Мальшаков Никита</h1>
                     
                     <div class="green">Личные данные:</div>
@@ -809,7 +809,7 @@
             </div>
 
 
-            <div style="display: none;" class = "content" id = "game">
+            <div style="display: flex; justify-content: center;" class = "content" id = "game">
                 <div id = "draw" onpointerdown = "startTouch(event, 'draw')">
                     <script>
                     
@@ -891,7 +891,7 @@
                     bottom_nav.classList.remove('bottom_out');
                     bottom_nav.style.display = 'block';
                 }
-                document.getElementById(tab).style.display = 'block';
+                document.getElementById(tab).style.display = 'flex';
                 setTimeout(() => --switching, 500)
                 //console.dir(event.currentTarget.classList);
                 event.currentTarget.classList.add('active');
